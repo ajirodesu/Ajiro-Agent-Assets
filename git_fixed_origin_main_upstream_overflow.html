@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Git - Version Control</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            appBlack: '#000000',
+            appCard: '#1d1e22',
+            appCardActive: '#282a30',
+            appCardMiddled: '#1d1e22',
+            appSectionHeader: '#5c7394',
+            appMutedText: '#8E8E93',
+            appBorder: 'rgba(255, 255, 255, 0.08)',
+            accentBlue: '#0070F3',
+            brandGreen: '#238636',
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', sans-serif],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+<style data-purpose="custom-styling">
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      width: 100vw;
+      min-height: 100vh;
+    }
+    /* Clean custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2b2c30;
+      border-radius: 9999px;
+    }
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(4px);
+    }
+    .touch-target:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body class="w-full bg-black text-white font-sans antialiased flex flex-col justify-between selection:bg-neutral-800 h-screen overflow-hidden">
+<!-- Mobile Edge-to-Edge Container -->
+<div class="w-full flex-1 flex flex-col max-w-md mx-auto relative h-screen overflow-hidden" id="app-root">
+<!-- Top Status Bar (Matching Session UI Principles) -->
+<header class="w-full px-6 pt-3 pb-1 flex items-center justify-between text-xs text-white tracking-normal font-medium shrink-0 z-30" data-purpose="status-bar">
+<div class="flex items-center space-x-2 text-[15px] font-semibold tracking-tight text-white">
+<span>2:51</span>
+<div class="w-4 h-4 rounded bg-[#007aff] flex items-center justify-center text-white text-[9px] font-bold">
+<svg class="w-3 h-3 text-white fill-current" viewbox="0 0 24 24">
+<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path>
+</svg>
+</div>
+</div>
+<div class="flex items-center space-x-2.5 text-[11px] font-medium text-neutral-200">
+<span class="flex items-center space-x-0.5 leading-none">
+<svg class="w-3 h-3 text-neutral-300" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+</svg>
+<span class="text-[9px] font-semibold leading-tight">1.60<br/><span class="text-[7.5px] font-normal">KB/s</span></span>
+</span>
+<span class="text-[10px] font-bold tracking-tighter">4G</span>
+<div class="flex items-end space-x-[2px] h-3 pb-0.5">
+<div class="w-[3px] h-1 bg-white rounded-xs"></div>
+<div class="w-[3px] h-1.5 bg-white rounded-xs"></div>
+<div class="w-[3px] h-2 bg-white rounded-xs"></div>
+<div class="w-[3px] h-2.5 bg-white rounded-xs"></div>
+</div>
+<div class="relative flex items-center justify-center bg-white text-black font-extrabold text-[9px] px-1.5 py-[1px] rounded-full min-w-[26px] h-[15px] leading-none">61</div>
+</div>
+</header>
+<!-- Top Navigation Bar with Back Arrow and Git Pill Badge (as seen in screenshots 1-6) -->
+<div class="w-full px-5 pt-2 pb-3 shrink-0 z-20" data-purpose="top-navigation"><div class="flex items-center justify-between"><div class="flex items-center space-x-3"><button aria-label="Go back" class="p-1 -ml-1 text-white active:opacity-60 transition-opacity flex items-center justify-center shrink-0" onclick="window.history.back()" type="button"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24"><line x1="19" x2="5" y1="12" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button><h1 class="text-[28px] font-bold tracking-tight text-white leading-tight">Git</h1></div><button aria-label="Settings" class="p-1 text-neutral-400 hover:text-white transition-colors active:opacity-60 flex items-center justify-center" onclick="openSettingsModal()"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button></div></div>
+<!-- Page Title & Subtitle (From Screenshots 2, 3, 5, 6) -->
+<!-- Active Branch Selector & Actions (Screenshots 3, 5, 6) -->
+<section class="w-full px-4 mb-3 shrink-0" data-purpose="branch-header">
+<div class="w-full h-[52px] px-4 bg-[#1d1e22] rounded-[18px] flex items-center justify-between border border-white/[0.04]">
+<!-- Branch Selector Trigger -->
+<button class="flex items-center space-x-2.5 text-white active:opacity-75 transition-opacity" onclick="toggleBranchDropdown()" type="button">
+<svg class="w-4 h-4 text-neutral-300 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<line x1="6" x2="6" y1="3" y2="15"></line>
+<circle cx="18" cy="6" r="3"></circle>
+<circle cx="6" cy="18" r="3"></circle>
+<path d="M18 9a9 9 0 0 1-9 9"></path>
+</svg>
+<span class="font-mono text-sm font-semibold tracking-tight text-white" id="current-branch-name">main</span>
+<svg class="w-4 h-4 text-neutral-400 transition-transform duration-200" fill="none" id="branch-arrow" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="6 9 12 15 18 9"></polyline>
+</svg>
+</button>
+<!-- Header Quick Icons: Settings & Refresh -->
+<div class="flex items-center space-x-2">
+<button class="p-1.5 text-neutral-400 hover:text-white rounded-lg active:scale-95 transition-all" onclick="refreshGitState()" title="Fetch Remote">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="23 4 23 10 17 10"></polyline>
+<polyline points="1 20 1 14 7 14"></polyline>
+<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- INLINE BRANCH DROPDOWN (Directly matched from Screenshot 3) -->
+<div class="hidden w-full mt-2 bg-[#18191d] border border-white/10 rounded-[20px] p-3 shadow-2xl space-y-3 z-30" id="branch-dropdown">
+<!-- Search or Create Branch Input -->
+<div class="relative w-full flex items-center">
+<input class="w-full h-10 bg-[#121316] border border-white/10 rounded-xl pl-3.5 pr-8 text-xs font-mono text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500" id="branch-search-input" oninput="filterBranches(this.value)" placeholder="Find or create a branch..." type="text"/>
+<svg class="w-4 h-4 text-neutral-400 absolute right-3 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<line x1="21" x2="16.65" y1="16.65" y2="21"></line>
+</svg>
+</div>
+<!-- Section: Important Branches -->
+<div class="space-y-1">
+<div class="text-[11px] font-semibold text-[#5c7394] px-1 uppercase tracking-wider">Important</div>
+<div class="w-full p-2.5 rounded-xl bg-[#22242a] flex items-center justify-between cursor-pointer hover:bg-[#282a32]" onclick="selectBranch('main')">
+<div class="flex items-center space-x-2.5">
+<span class="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+<span class="font-mono text-xs font-semibold text-white">main</span>
+</div>
+<span class="text-[11px] text-neutral-400 font-sans">Lance Cochangco · 15 days ago</span>
+</div>
+</div>
+<!-- Section: Stale Branches -->
+<div class="space-y-1 pt-1 border-t border-white/5">
+<div class="text-[11px] font-semibold text-[#5c7394] px-1 uppercase tracking-wider">Stale</div>
+<div class="w-full p-2 rounded-lg hover:bg-neutral-800/60 flex items-center justify-between cursor-pointer" onclick="selectBranch('replit-agent')">
+<span class="font-mono text-xs text-neutral-300">replit-agent</span>
+<span class="text-[10px] text-neutral-500">2 months ago</span>
+</div>
+<div class="w-full p-2 rounded-lg hover:bg-neutral-800/60 flex items-center justify-between cursor-pointer" onclick="selectBranch('gitsafe-backup/main')">
+<span class="font-mono text-xs text-neutral-300 truncate">gitsafe-backup/main</span>
+<span class="text-[10px] text-neutral-500">2 months ago</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SCROLLABLE CONTENT BODY (3px Group Spacing & Matched Curveness) -->
+<main class="w-full px-4 flex-1 overflow-y-auto overflow-x-hidden min-h-0 space-y-4 pb-8" id="git-main-scroll">
+<!-- SECTION 1: REMOTE UPDATES (From Screenshots 3, 5, 6) -->
+<section class="w-full flex flex-col" data-section="remote-updates">
+<!-- Section Header with Remote Repo Link -->
+<div class="flex items-center justify-between px-3 mb-[6px]">
+<h2 class="text-[13px] font-medium text-[#5c7394] tracking-wide">Remote Updates</h2>
+<a class="flex items-center space-x-1.5 text-xs text-neutral-400 hover:text-white transition-colors min-w-0 max-w-[200px]" href="https://github.com/ajirodesu/Persian-Bot" target="_blank"><svg class="w-3.5 h-3.5 fill-current shrink-0" viewbox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"></path></svg><span class="font-mono text-[11px] truncate min-w-0">ajirodesu/Persian-Bot</span><svg class="w-3 h-3 text-neutral-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" x2="21" y1="14" y2="3"></line></svg></a>
+</div>
+<!-- Remote Container Card with Origin status & Sync/Pull/Push buttons -->
+<div class="w-full bg-[#1d1e22] rounded-[24px] p-4 flex flex-col space-y-3.5 border border-white/[0.04] overflow-hidden">
+<!-- Upstream Status Row -->
+<div class="flex items-center justify-between text-xs min-w-0 overflow-hidden gap-2"><div class="flex items-center space-x-1.5 min-w-0 shrink"><span class="font-mono font-semibold text-white truncate min-w-0 text-xs">origin/main</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span><span class="text-neutral-400 font-mono text-[11px] truncate min-w-0">upstream</span></div><div class="flex items-center space-x-1 text-neutral-400 text-[11px] shrink-0 min-w-0"><span class="truncate">last fetched 15 days ago</span><button class="p-1 text-neutral-400 hover:text-white shrink-0" onclick="refreshGitState()"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg></button></div></div>
+<!-- Action Buttons Row: Sync Changes (Main Pill) + Pull + Push -->
+<div class="grid grid-cols-3 gap-2 w-full"><button class="touch-target h-10 px-2 bg-[#26282f] hover:bg-[#2e313a] active:bg-[#343742] rounded-xl flex items-center justify-center space-x-1.5 text-white font-medium text-xs transition-colors min-w-0 truncate" id="btn-sync" onclick="simulateSync()"><svg class="w-3.5 h-3.5 text-neutral-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg><span class="truncate">Sync</span></button><button class="touch-target h-10 px-2 bg-[#26282f] hover:bg-[#2e313a] active:bg-[#343742] rounded-xl flex items-center justify-center space-x-1.5 text-white font-medium text-xs transition-colors min-w-0 truncate" onclick="simulatePull()"><svg class="w-3.5 h-3.5 text-neutral-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><line x1="12" x2="12" y1="5" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg><span class="truncate">Pull</span></button><button class="touch-target h-10 px-2 bg-[#26282f] hover:bg-[#2e313a] active:bg-[#343742] rounded-xl flex items-center justify-center space-x-1.5 text-white font-medium text-xs transition-colors min-w-0 truncate" onclick="simulatePush()"><svg class="w-3.5 h-3.5 text-neutral-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><line x1="12" x2="12" y1="19" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg><span class="truncate">Push</span></button></div>
+</div>
+</section>
+<!-- SECTION 2: COMMIT WORKFLOW (Screenshots 4 & 5 with collapsible form) -->
+<section class="w-full flex flex-col" data-section="commit-workflow">
+<div class="flex items-center justify-between px-3 mb-[6px]">
+<h2 class="text-[13px] font-medium text-[#5c7394] tracking-wide">Commit</h2>
+<span class="text-[11px] font-mono text-neutral-400" id="staged-count-badge">1 change</span>
+</div>
+<div class="w-full bg-[#1d1e22] rounded-[24px] p-4 flex flex-col space-y-3.5 border border-white/[0.04]">
+<!-- Commit Message Inputs -->
+<div class="w-full flex flex-col space-y-2">
+<div class="flex items-center justify-between text-xs text-neutral-300 font-medium cursor-pointer" id="commit-message-header" onclick="toggleMessageAccordion()">
+<span>Message</span>
+<svg class="w-3.5 h-3.5 text-neutral-400 transition-transform duration-200" fill="none" id="message-chevron" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="18 15 12 9 6 15"></polyline>
+</svg>
+</div>
+<!-- Summary Input -->
+<input class="w-full h-11 bg-[#151619] border border-white/5 rounded-xl px-3.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 font-sans" id="commit-summary" placeholder="Summary" type="text"/>
+<!-- Description (Optional) -->
+<textarea class="w-full bg-[#151619] border border-white/5 rounded-xl p-3 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 resize-none font-sans" id="commit-description" placeholder="Description (optional)" rows="2"></textarea><script>
+function toggleMessageAccordion() {
+  const desc = document.getElementById('commit-description');
+  const chevron = document.getElementById('message-chevron');
+  if (desc.classList.contains('hidden')) {
+    desc.classList.remove('hidden');
+    chevron.classList.remove('rotate-180');
+  } else {
+    desc.classList.add('hidden');
+    chevron.classList.add('rotate-180');
+  }
+}
+</script>
+</div>
+<!-- Review Changes Header & Action Buttons -->
+<div class="w-full pt-2 border-t border-white/5 flex flex-col space-y-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1.5 text-xs font-medium text-neutral-300">
+<svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="6 9 12 15 18 9"></polyline>
+</svg>
+<span>1 changed file</span>
+</div>
+<div class="flex items-center space-x-2 text-[11px]">
+<button class="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-[#282a31] text-neutral-300 hover:text-white" onclick="discardChanges()">
+<svg class="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="1 4 1 10 7 10"></polyline>
+<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+</svg>
+<span>Discard All</span>
+</button>
+<button class="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-[#282a31] text-neutral-300 hover:text-white" id="btn-stage-all" onclick="toggleStageAll()">
+<span id="stage-all-icon">+</span>
+<span id="stage-all-text">Stage All</span>
+</button>
+</div>
+</div>
+<!-- Changed File Item: test.ts (Matched from Screenshots 3, 4, 5) -->
+<div class="w-full py-2.5 px-3 bg-[#151619] rounded-xl flex items-center justify-between border border-white/[0.04]" id="file-row-test-ts">
+<div class="flex items-center space-x-2.5 min-w-0">
+<!-- TS Badge -->
+<div class="w-5 h-5 rounded bg-[#007acc] text-white flex items-center justify-center text-[9px] font-bold shrink-0">TS</div>
+<span class="text-xs font-mono font-medium text-white truncate">test.ts</span>
+</div>
+<div class="flex items-center space-x-2 shrink-0">
+<!-- Discard file change icon -->
+<button class="p-1 text-neutral-400 hover:text-white" onclick="discardFile('test.ts')" title="Discard file">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="1 4 1 10 7 10"></polyline>
+<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+</svg>
+</button>
+<!-- Stage File icon -->
+<button class="p-1 text-neutral-400 hover:text-white" id="file-stage-btn" onclick="toggleStageFile('test.ts')" title="Stage file">
+<span class="text-sm font-bold leading-none">+</span>
+</button>
+<!-- Status letter 'A' badge -->
+<span class="w-5 h-5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60 text-[10px] font-mono font-bold flex items-center justify-center">A</span>
+</div>
+</div>
+<p class="text-[11px] text-neutral-500 font-sans tracking-tight text-center pt-0.5">
+              Committing will automatically stage your changes.
+            </p>
+</div>
+<!-- Primary Commit CTA Button (Vibrant Blue as in Screenshots 1, 3, 4, 5) -->
+<button class="touch-target w-full h-11 bg-[#0070F3] hover:bg-[#0060df] active:bg-[#0051bb] text-white rounded-xl flex items-center justify-center space-x-2 font-semibold text-xs transition-all shadow-md mt-1" id="btn-primary-commit" onclick="executeCommit()">
+<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<polyline points="20 6 9 17 4 12"></polyline>
+</svg>
+<span id="commit-btn-text">Stage and commit all changes</span>
+</button>
+</div>
+</section>
+<!-- SECTION 3: RECENT COMMITS TIMELINE (From Screenshot 6) -->
+<section class="w-full flex flex-col pt-1" data-section="commit-history">
+<h2 class="text-[13px] font-medium text-[#5c7394] px-3 mb-[8px] tracking-wide">Commit History</h2>
+<!-- 3px Group Rhythm with Rounded Edges -->
+<div class="w-full flex flex-col space-y-[3px]">
+<!-- Commit 1: Needle client update (Top Card: rounded-t-[26px] rounded-b-[4px]) -->
+<div class="w-full p-4 bg-[#1d1e22] active:bg-[#282a30] rounded-t-[26px] rounded-b-[4px] flex flex-col space-y-1.5 transition-colors cursor-pointer border border-white/[0.02]">
+<div class="flex items-center space-x-2.5">
+<span class="w-2 h-2 rounded-full bg-neutral-300 shrink-0"></span>
+<span class="text-xs font-mono font-semibold text-white truncate">feat: Update Needle client to use standalone W...</span>
+</div>
+<div class="flex items-center space-x-2 text-[11px] text-neutral-400 pl-4">
+<svg class="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+<span>Lance Cochangco</span>
+<span>·</span>
+<span>15 days ago</span>
+</div>
+</div>
+<!-- Commit 2: Consolidate git overview (Middled Card: rounded-[4px]) -->
+<div class="w-full p-4 bg-[#1d1e22] active:bg-[#282a30] rounded-[4px] flex flex-col space-y-1.5 transition-colors cursor-pointer border border-white/[0.02]">
+<div class="flex items-center space-x-2.5">
+<span class="w-2 h-2 rounded-full bg-neutral-300 shrink-0"></span>
+<span class="text-xs font-mono font-semibold text-white truncate">feat: consolidate Git overview requests into a si...</span>
+</div>
+<div class="flex items-center space-x-2 text-[11px] text-neutral-400 pl-4">
+<svg class="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+<span>Lance Cochangco</span>
+<span>·</span>
+<span>15 days ago</span>
+</div>
+</div>
+<!-- Commit 3: Merged Pull Request (Middled Card: rounded-[4px]) -->
+<div class="w-full p-4 bg-[#1d1e22] active:bg-[#282a30] rounded-[4px] flex flex-col space-y-1.5 transition-colors cursor-pointer border border-white/[0.02]">
+<div class="flex items-center space-x-2.5">
+<!-- Purple Merge Circle Icon -->
+<span class="w-4 h-4 rounded-full bg-purple-900/80 text-purple-300 border border-purple-500/50 flex items-center justify-center text-[9px] shrink-0">
+                ⑂
+              </span>
+<div class="flex items-center space-x-1.5 min-w-0">
+<span class="text-xs font-mono font-bold text-purple-400">merged</span>
+<span class="text-xs font-mono text-neutral-300">f902fe5a7 ⇆ cc8cb7c29</span>
+</div>
+</div>
+<p class="text-xs font-mono text-neutral-300 pl-6 truncate">Merge AI Agent (Cactus Needle 3) into main</p>
+<div class="flex items-center space-x-2 text-[11px] text-neutral-400 pl-6">
+<svg class="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+<span>Lance Cochangco</span>
+<span>·</span>
+<span>15 days ago</span>
+</div>
+</div>
+<!-- Commit 4: Fix working local environment (Bottom Card: rounded-t-[4px] rounded-b-[26px]) -->
+<div class="w-full p-4 bg-[#1d1e22] active:bg-[#282a30] rounded-t-[4px] rounded-b-[26px] flex flex-col space-y-1.5 transition-colors cursor-pointer border border-white/[0.02]">
+<div class="flex items-center space-x-2.5">
+<span class="w-2 h-2 rounded-full bg-neutral-300 shrink-0"></span>
+<span class="text-xs font-mono font-semibold text-white truncate">fix: working local environment out of the box</span>
+</div>
+<div class="flex items-center space-x-2 text-[11px] text-neutral-400 pl-4">
+<svg class="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+<span>OpenCode</span>
+<span>·</span>
+<span>15 days ago</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Gesture Home Bar Indicator -->
+<footer class="w-full flex justify-center items-center pt-3 pb-3 shrink-0" data-purpose="home-bar">
+<div class="w-36 h-1 bg-neutral-600 rounded-full"></div>
+</footer>
+</div>
+<!-- MODAL 1: GIT REMOTE & CONNECTIONS SETTINGS (From Screenshot 2) -->
+<div class="modal-backdrop fixed inset-0 z-50 flex items-end justify-center hidden" id="settings-modal" onclick="handleModalBackdrop(event, 'settings-modal')">
+<div class="w-full max-w-md bg-[#16171a] rounded-t-[32px] p-5 shadow-2xl flex flex-col max-h-[88vh] overflow-y-auto border-t border-neutral-800" onclick="event.stopPropagation()">
+<!-- Modal Navigation Header -->
+<div class="flex items-center justify-between pb-3 border-b border-neutral-800 shrink-0">
+<button class="flex items-center space-x-1.5 text-neutral-300 hover:text-white text-xs font-medium" onclick="closeSettingsModal()">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+<span>Settings</span>
+</button>
+<button class="text-xs font-semibold text-[#0070F3] hover:underline" onclick="openCreateRepoModal()">
+          + New Repo
+        </button>
+</div>
+<div class="py-4 space-y-5">
+<!-- Remote URL section -->
+<div class="space-y-2">
+<label class="text-xs font-semibold text-[#5c7394] uppercase tracking-wide">Remote</label>
+<div class="flex items-center space-x-2">
+<input class="flex-1 h-10 bg-[#1f2025] border border-white/5 rounded-xl px-3 text-xs font-mono text-neutral-300 focus:outline-none truncate" readonly="" type="text" value="https://github.com/ajirodesu/Persian-Bot"/>
+<button class="h-10 px-3 bg-[#2a2c34] text-white text-xs font-medium rounded-xl shrink-0 hover:bg-[#343742]" onclick="alert('Remote updated successfully!')">
+              Create Remote
+            </button>
+</div>
+</div>
+<!-- Connections Section with GitHub, Bitbucket, GitLab (Screenshot 2) -->
+<div class="space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold text-[#5c7394] uppercase tracking-wide">Connections</span>
+<svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg>
+</div>
+<!-- 3px Spacing for Connections Cards -->
+<div class="flex flex-col space-y-[3px]">
+<!-- GitHub: Active (Top: rounded-t-[20px] rounded-b-[4px]) -->
+<div class="w-full p-3.5 bg-[#1d1e22] rounded-t-[20px] rounded-b-[4px] flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<svg class="w-5 h-5 fill-white" viewbox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"></path></svg>
+<div class="flex items-center space-x-2">
+<span class="text-xs font-semibold text-white">GitHub</span>
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span class="text-[11px] text-emerald-400 font-medium">Active</span>
+</div>
+</div>
+<button class="px-3 py-1.5 bg-[#2a2c34] text-neutral-300 text-xs rounded-lg hover:text-red-400" onclick="alert('Disconnected GitHub account')">
+                Delete
+              </button>
+</div>
+<!-- Bitbucket: Disconnected (Middled: rounded-[4px]) -->
+<div class="w-full p-3.5 bg-[#1d1e22] rounded-[4px] flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<svg class="w-5 h-5 text-[#2684FF] fill-current" viewbox="0 0 24 24"><path d="M.75 3.375A.75.75 0 0 1 1.5 2.625h21a.75.75 0 0 1 .75.844l-2.625 17.5a.75.75 0 0 1-.742.631H4.117a.75.75 0 0 1-.742-.631L.75 3.375zm13.149 13.5h-3.798l-1.05-6.75h5.898l-1.05 6.75z"></path></svg>
+<div class="flex items-center space-x-2">
+<span class="text-xs font-semibold text-white">Bitbucket</span>
+<span class="w-1.5 h-1.5 rounded-full bg-neutral-500"></span>
+<span class="text-[11px] text-neutral-400">Disconnected</span>
+</div>
+</div>
+<button class="px-3 py-1.5 bg-[#2a2c34] text-white text-xs font-medium rounded-lg flex items-center space-x-1 hover:bg-[#343742]" onclick="alert('Redirecting to Bitbucket sign in')">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" x2="3" y1="12" y2="12"></line></svg>
+<span>Sign in</span>
+</button>
+</div>
+<!-- GitLab: Disconnected (Bottom: rounded-t-[4px] rounded-b-[20px]) -->
+<div class="w-full p-3.5 bg-[#1d1e22] rounded-t-[4px] rounded-b-[20px] flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<svg class="w-5 h-5 text-[#FC6D26] fill-current" viewbox="0 0 24 24"><path d="m23.6 9.58-1.01-3.13a1.1 1.1 0 0 0-.41-.53 1.15 1.15 0 0 0-.67-.21 1.13 1.13 0 0 0-.67.22 1.1 1.1 0 0 0-.41.52l-1.63 5.03H5.2L3.57 6.46a1.1 1.1 0 0 0-.41-.52 1.13 1.13 0 0 0-.67-.22 1.15 1.15 0 0 0-.67.21 1.1 1.1 0 0 0-.41.53L.39 9.58a1.07 1.07 0 0 0 .39 1.19l11.02 8.01a.38.38 0 0 0 .44 0l11-8.01a1.08 1.08 0 0 0 .36-1.19z"></path></svg>
+<div class="flex items-center space-x-2">
+<span class="text-xs font-semibold text-white">GitLab</span>
+<span class="w-1.5 h-1.5 rounded-full bg-neutral-500"></span>
+<span class="text-[11px] text-neutral-400">Disconnected</span>
+</div>
+</div>
+<button class="px-3 py-1.5 bg-[#2a2c34] text-white text-xs font-medium rounded-lg flex items-center space-x-1 hover:bg-[#343742]" onclick="alert('Redirecting to GitLab sign in')">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" x2="3" y1="12" y2="12"></line></svg>
+<span>Sign in</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Commit Author Radio Selector (Screenshot 2) -->
+<div class="space-y-2.5">
+<label class="text-xs font-semibold text-[#5c7394] uppercase tracking-wide">Commit author</label>
+<div class="flex flex-col space-y-[3px]">
+<!-- Profile 1: shawniwato (Top: rounded-t-[20px] rounded-b-[4px]) -->
+<label class="w-full p-3.5 bg-[#1d1e22] rounded-t-[20px] rounded-b-[4px] flex items-center justify-between cursor-pointer">
+<div class="flex items-center space-x-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-neutral-700 flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden">
+<span class="text-neutral-300">SI</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center space-x-2">
+<span class="text-xs font-semibold text-white">shawniwato</span>
+<span class="text-[10px] text-neutral-400">Default Profile</span>
+</div>
+<span class="text-[11px] text-neutral-400 truncate">Shawn Iwato &lt;42036919-shawniwato@user...&gt;</span>
+</div>
+</div>
+<input class="text-blue-600 focus:ring-0 bg-[#25272e] border-neutral-700 ml-2" name="commit-author" type="radio" value="shawniwato"/>
+</label>
+<!-- Profile 2: ajirodesu (Active Checked) (Bottom: rounded-t-[4px] rounded-b-[20px]) -->
+<label class="w-full p-3.5 bg-[#1d1e22] rounded-t-[4px] rounded-b-[20px] flex items-center justify-between cursor-pointer border border-blue-500/30">
+<div class="flex items-center space-x-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-xs font-bold shrink-0">
+<span class="text-white">LC</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center space-x-2">
+<span class="text-xs font-semibold text-white">ajirodesu</span>
+<span class="text-[10px] text-blue-400">GitHub Settings ↗</span>
+</div>
+<span class="text-[11px] text-neutral-400 truncate">Lance Cochangco &lt;lancecochangco@gmail....&gt;</span>
+</div>
+</div>
+<input checked="" class="text-blue-600 focus:ring-0 bg-[#25272e] border-neutral-700 ml-2" name="commit-author" type="radio" value="ajirodesu"/>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- MODAL 2: CREATE REPOSITORY MODAL (From Screenshot 1) -->
+<div class="modal-backdrop fixed inset-0 z-50 flex items-end justify-center hidden" id="create-repo-modal" onclick="handleModalBackdrop(event, 'create-repo-modal')">
+<div class="w-full max-w-md bg-[#18191d] rounded-t-[32px] p-5 shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto border-t border-neutral-800 space-y-4" onclick="event.stopPropagation()">
+<div class="flex items-center justify-between pb-2 border-b border-white/10 shrink-0">
+<h3 class="text-sm font-semibold text-white">Git Provider</h3>
+<button class="p-1 text-neutral-400 hover:text-white" onclick="closeCreateRepoModal()">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</button>
+</div>
+<!-- Git Provider Switcher (GitHub, Bitbucket, GitLab) -->
+<div class="grid grid-cols-3 gap-2">
+<button class="h-10 px-2 rounded-xl bg-[#22242a] border border-blue-500/60 flex items-center justify-center space-x-1.5 text-xs font-medium text-white">
+<svg class="w-4 h-4 fill-white" viewbox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"></path></svg>
+<span>GitHub</span>
+</button>
+<button class="h-10 px-2 rounded-xl bg-[#1b1c20] text-neutral-400 hover:text-white flex items-center justify-center space-x-1.5 text-xs font-medium">
+<svg class="w-4 h-4 text-[#2684FF] fill-current" viewbox="0 0 24 24"><path d="M.75 3.375A.75.75 0 0 1 1.5 2.625h21a.75.75 0 0 1 .75.844l-2.625 17.5a.75.75 0 0 1-.742.631H4.117a.75.75 0 0 1-.742-.631L.75 3.375zm13.149 13.5h-3.798l-1.05-6.75h5.898l-1.05 6.75z"></path></svg>
+<span>Bitbucket</span>
+</button>
+<button class="h-10 px-2 rounded-xl bg-[#1b1c20] text-neutral-400 hover:text-white flex items-center justify-center space-x-1.5 text-xs font-medium">
+<svg class="w-4 h-4 text-[#FC6D26] fill-current" viewbox="0 0 24 24"><path d="m23.6 9.58-1.01-3.13a1.1 1.1 0 0 0-.41-.53 1.15 1.15 0 0 0-.67-.21 1.13 1.13 0 0 0-.67.22 1.1 1.1 0 0 0-.41.52l-1.63 5.03H5.2L3.57 6.46a1.1 1.1 0 0 0-.41-.52 1.13 1.13 0 0 0-.67-.22 1.15 1.15 0 0 0-.67.21 1.1 1.1 0 0 0-.41.53L.39 9.58a1.07 1.07 0 0 0 .39 1.19l11.02 8.01a.38.38 0 0 0 .44 0l11-8.01a1.08 1.08 0 0 0 .36-1.19z"></path></svg>
+<span>GitLab</span>
+</button>
+</div>
+<!-- Repository Location -->
+<div class="space-y-1.5">
+<label class="text-xs font-medium text-neutral-400">Repository Location</label>
+<div class="grid grid-cols-2 gap-2">
+<button class="h-10 rounded-xl bg-[#22242a] text-white border border-blue-500/50 flex items-center justify-center space-x-2 text-xs font-medium">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+<span>Personal</span>
+</button>
+<button class="h-10 rounded-xl bg-[#1b1c20] text-neutral-400 hover:text-white flex items-center justify-center space-x-2 text-xs font-medium">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="20" rx="2" ry="2" width="16" x="4" y="2"></rect><line x1="9" x2="9" y1="22" y2="22.01"></line><line x1="15" x2="15" y1="22" y2="22.01"></line></svg>
+<span>Organization</span>
+</button>
+</div>
+</div>
+<!-- Repository Name -->
+<div class="space-y-1.5">
+<label class="text-xs font-medium text-neutral-400">Repository name</label>
+<input class="w-full h-11 bg-[#121316] border border-white/10 rounded-xl px-3.5 text-xs font-mono text-white focus:outline-none focus:border-blue-500" type="text" value="Persian-Bot-11"/>
+</div>
+<!-- Repository Description -->
+<div class="space-y-1.5">
+<label class="text-xs font-medium text-neutral-400">Repository description</label>
+<textarea class="w-full bg-[#121316] border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-blue-500" rows="2">only support Discord, Telegram and Web Bot Platform.</textarea>
+</div>
+<!-- Privacy -->
+<div class="space-y-1.5">
+<label class="text-xs font-medium text-neutral-400">Privacy</label>
+<div class="grid grid-cols-2 gap-2">
+<button class="h-10 rounded-xl bg-[#22242a] text-white border border-blue-500/50 flex items-center justify-center space-x-2 text-xs font-medium">
+<svg class="w-3.5 h-3.5 text-neutral-300" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+<span>Private</span>
+</button>
+<button class="h-10 rounded-xl bg-[#1b1c20] text-neutral-400 hover:text-white flex items-center justify-center space-x-2 text-xs font-medium">
+<svg class="w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" x2="22" y1="12" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+<span>Public</span>
+</button>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full h-11 bg-[#0070F3] hover:bg-[#0060df] text-white rounded-xl flex items-center justify-center space-x-2 text-xs font-semibold shadow-lg transition-colors" onclick="simulateCreateRepo()">
+<svg class="w-4 h-4 fill-white" viewbox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"></path></svg>
+<span>Create Repository on GitHub</span>
+</button>
+</div>
+</div>
+<!-- INTERACTIVE CLIENT-SIDE JAVASCRIPT -->
+<script data-purpose="git-interactions">
+    let isStaged = false;
+    let hasChanges = true;
+
+    function toggleBranchDropdown() {
+      const dropdown = document.getElementById('branch-dropdown');
+      const arrow = document.getElementById('branch-arrow');
+      const isHidden = dropdown.classList.contains('hidden');
+      if (isHidden) {
+        dropdown.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+      } else {
+        dropdown.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+      }
+    }
+
+    function selectBranch(name) {
+      document.getElementById('current-branch-name').innerText = name;
+      toggleBranchDropdown();
+    }
+
+    function filterBranches(query) {
+      const q = query.toLowerCase().trim();
+      const items = document.querySelectorAll('#branch-dropdown [onclick^="selectBranch"]');
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = (!q || text.includes(q)) ? 'flex' : 'none';
+      });
+    }
+
+    function toggleStageAll() {
+      isStaged = !isStaged;
+      const btnText = document.getElementById('stage-all-text');
+      const icon = document.getElementById('stage-all-icon');
+      const commitBtnText = document.getElementById('commit-btn-text');
+      
+      if (isStaged) {
+        btnText.innerText = 'Unstage All';
+        icon.innerText = '-';
+        commitBtnText.innerText = 'Commit staged changes';
+      } else {
+        btnText.innerText = 'Stage All';
+        icon.innerText = '+';
+        commitBtnText.innerText = 'Stage and commit all changes';
+      }
+    }
+
+    function toggleStageFile(filename) {
+      toggleStageAll();
+    }
+
+    function discardChanges() {
+      if (confirm('Are you sure you want to discard all local changes?')) {
+        const row = document.getElementById('file-row-test-ts');
+        if (row) row.style.display = 'none';
+        document.getElementById('staged-count-badge').innerText = '0 changes';
+        document.getElementById('commit-summary').disabled = true;
+        document.getElementById('commit-description').disabled = true;
+        document.getElementById('btn-primary-commit').disabled = true;
+        document.getElementById('btn-primary-commit').classList.add('opacity-50', 'pointer-events-none');
+        document.getElementById('commit-btn-text').innerText = 'There are no changes to commit';
+      }
+    }
+
+    function discardFile(filename) {
+      discardChanges();
+    }
+
+    function executeCommit() {
+      const summary = document.getElementById('commit-summary').value.trim();
+      if (!summary) {
+        alert('Please enter a commit summary first.');
+        document.getElementById('commit-summary').focus();
+        return;
+      }
+      alert(`Committed changes: "${summary}" successfully!`);
+      document.getElementById('commit-summary').value = '';
+      document.getElementById('commit-description').value = '';
+      discardChanges();
+    }
+
+    function simulateSync() {
+      const btn = document.getElementById('btn-sync');
+      btn.classList.add('opacity-75');
+      btn.innerHTML = `<span class="animate-spin text-sm">↻</span><span>Syncing...</span>`;
+      setTimeout(() => {
+        btn.classList.remove('opacity-75');
+        btn.innerHTML = `<svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Synced up-to-date</span>`;
+      }, 900);
+    }
+
+    function simulatePull() {
+      alert('Pulling latest commits from origin/main...');
+    }
+
+    function simulatePush() {
+      alert('Pushed current branch to origin/main.');
+    }
+
+    function refreshGitState() {
+      alert('Fetched remote references from upstream.');
+    }
+
+    // Modal Control Handlers
+    function openSettingsModal() {
+      document.getElementById('settings-modal').classList.remove('hidden');
+    }
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    function openCreateRepoModal() {
+      document.getElementById('settings-modal').classList.add('hidden');
+      document.getElementById('create-repo-modal').classList.remove('hidden');
+    }
+    function closeCreateRepoModal() {
+      document.getElementById('create-repo-modal').classList.add('hidden');
+    }
+
+    function simulateCreateRepo() {
+      alert('Repository created on GitHub successfully!');
+      closeCreateRepoModal();
+    }
+
+    function handleModalBackdrop(e, modalId) {
+      if (e.target.id === modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
