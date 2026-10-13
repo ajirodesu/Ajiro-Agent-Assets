@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Console</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            appBlack: '#000000',
+            appCard: '#1d1e22',
+            appCardActive: '#282a30',
+            appSectionHeader: '#5c7394',
+            appMutedText: '#8E8E93',
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', sans-serif],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+<style data-purpose="custom-styling">
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    ::-webkit-scrollbar {
+      width: 3px;
+      height: 3px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2b2c30;
+      border-radius: 9999px;
+    }
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+    }
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    .cursor-blink {
+      animation: blink 1s infinite;
+    }
+  </style>
+</head>
+<body class="h-screen w-full bg-black text-white font-sans antialiased flex flex-col justify-between overflow-hidden selection:bg-neutral-800">
+<!-- Mobile Edge-to-Edge Container -->
+<div class="w-full max-w-md mx-auto min-h-screen h-screen flex flex-col justify-between overflow-x-hidden overflow-y-hidden bg-black relative" id="app-root">
+<!-- Top Status Bar (Matching original files & screenshot) -->
+<header class="w-full px-6 pt-3 pb-1 flex items-center justify-between text-xs text-white tracking-normal font-medium shrink-0 z-30 select-none" data-purpose="status-bar">
+<div class="flex items-center space-x-2 text-[15px] font-semibold tracking-tight text-white">
+<span>2:51</span>
+<div class="w-4 h-4 rounded bg-[#007aff] flex items-center justify-center text-white text-[9px] font-bold">
+<svg class="w-3 h-3 text-white fill-current" viewbox="0 0 24 24">
+<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path>
+</svg>
+</div>
+</div>
+<div class="flex items-center space-x-2.5 text-[11px] font-medium text-neutral-200">
+<span class="flex items-center space-x-0.5 leading-none">
+<svg class="w-3 h-3 text-neutral-300" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+</svg>
+<span class="text-[9px] font-semibold leading-tight">1.60<br/><span class="text-[7.5px] font-normal">KB/s</span></span>
+</span>
+<span class="text-[10px] font-bold tracking-tighter">4G</span>
+<div class="flex items-end space-x-[2px] h-3 pb-0.5">
+<div class="w-[3px] h-1 bg-white rounded-xs"></div>
+<div class="w-[3px] h-1.5 bg-white rounded-xs"></div>
+<div class="w-[3px] h-2 bg-white rounded-xs"></div>
+<div class="w-[3px] h-2.5 bg-white rounded-xs"></div>
+</div>
+<div class="relative flex items-center justify-center bg-white text-black font-extrabold text-[9px] px-1.5 py-[1px] rounded-full min-w-[26px] h-[15px] leading-none">61</div>
+</div>
+</header>
+<!-- Top Navigation Bar (With Arrow-Left, Console Title, Status badge & Header actions) -->
+<section class="w-full px-5 pt-2 pb-2.5 flex items-center justify-between shrink-0 z-20 select-none border-b border-neutral-900" data-purpose="top-navigation">
+<div class="flex items-center space-x-3 min-w-0 flex-1 mr-2">
+<button aria-label="Go back" class="p-1 -ml-1 text-white active:opacity-60 transition-opacity flex items-center justify-center shrink-0" type="button">
+<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24">
+<line x1="19" x2="5" y1="12" y2="12"></line>
+<polyline points="12 19 5 12 12 5"></polyline>
+</svg>
+</button>
+<div class="flex items-center space-x-2.5 min-w-0">
+<h1 class="text-[24px] font-bold tracking-tight text-white leading-none truncate">Console</h1>
+</div>
+</div>
+<div class="flex items-center space-x-1 shrink-0">
+<button aria-label="Start execution" class="w-9 h-9 flex items-center justify-center text-emerald-400 hover:text-emerald-300 active:opacity-60 transition-all rounded-lg" id="header-play-btn" onclick="toggleExecutionState()" title="Start execution" type="button"><svg class="w-5 h-5 fill-current" id="play-icon" viewbox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg></button><button class="w-9 h-9 flex items-center justify-center text-neutral-300 hover:text-white active:opacity-60 transition-opacity" id="header-restart-btn" onclick="triggerRestartSim()" title="Restart process" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<button class="w-9 h-9 flex items-center justify-center text-neutral-300 hover:text-white active:opacity-60 transition-opacity" onclick="clearLogs()" title="Clear terminal buffer" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<button class="w-9 h-9 flex items-center justify-center text-white active:opacity-60 transition-opacity p-0" onclick="toggleWorkflowSheet()" title="Console Options" type="button">
+<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="5" r="1"></circle>
+<circle cx="12" cy="12" r="1"></circle>
+<circle cx="12" cy="19" r="1"></circle>
+</svg>
+</button>
+</div>
+</section>
+<!-- FULL-SCREEN TERMINAL CONSOLE BODY (Seamlessly takes the rest of the height) -->
+<main class="w-full flex-1 min-h-0 flex flex-col bg-[#0e0f12] overflow-hidden" id="terminal-container">
+<!-- Terminal Window Chrome / Header Bar -->
+<div class="w-full px-4 py-2 bg-[#141518] border-b border-neutral-800/80 flex items-center justify-between shrink-0 select-none">
+<div class="flex items-center space-x-2.5 min-w-0">
+<div class="flex items-center space-x-1.5 shrink-0">
+<span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56] inline-block opacity-80 cursor-pointer" onclick="clearLogs()" title="Close / clear"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] inline-block opacity-80"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#27c93f] inline-block opacity-80"></span>
+</div>
+<div class="flex items-center space-x-1.5 pl-1 min-w-0">
+<span class="text-[11px] text-neutral-300 font-mono font-medium truncate">bash (80×24)</span>
+<span class="text-neutral-600 text-[11px] font-mono">·</span>
+<span class="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-1 py-0.2 rounded shrink-0">pts/0</span>
+</div>
+</div>
+<div class="flex items-center space-x-2 shrink-0">
+<span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center space-x-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+<span>LIVE :8080</span>
+</span>
+<button class="px-2 py-0.5 rounded bg-[#1f2126] hover:bg-neutral-700 active:bg-neutral-800 text-[10px] font-mono text-neutral-300 transition-colors border border-neutral-800" onclick="clearLogs()" title="Clear console buffer">clear</button>
+</div>
+</div>
+<!-- Terminal Live Stream Viewport (Full height, scrollable monospace stdout buffer with wrap protection) -->
+<div class="w-full flex-1 min-h-0 p-3.5 sm:p-4 overflow-y-auto overflow-x-hidden break-words whitespace-pre-wrap space-y-2 text-[11px] font-mono leading-relaxed bg-[#0c0d10]" id="terminal-body">
+<!-- Boot Line -->
+<div class="flex items-start space-x-2 text-neutral-400 min-w-0">
+<span class="text-neutral-600 select-none shrink-0">15:15:02.108</span>
+<span class="text-sky-400 font-semibold shrink-0">[init]</span>
+<span class="text-neutral-300 flex-1 min-w-0 break-words">Booting runtime sandbox container (PID <span class="text-emerald-400 font-semibold">4192</span>, Linux x86_64)</span>
+</div>
+<!-- Runtime Environment -->
+<div class="flex items-start space-x-2 text-neutral-400 min-w-0">
+<span class="text-neutral-600 select-none shrink-0">15:15:03.420</span>
+<span class="text-emerald-400 font-semibold shrink-0">[ready]</span>
+<span class="text-neutral-300 flex-1 min-w-0 break-words">Environment initialized in <span class="text-amber-400">312ms</span> · Node.js <span class="text-emerald-300">v20.11</span>, pnpm <span class="text-neutral-200">8.15</span></span>
+</div>
+<!-- Workflow Target Execution -->
+<div class="flex items-start space-x-2 text-neutral-400 min-w-0">
+<span class="text-neutral-600 select-none shrink-0">15:15:04.002</span>
+<span class="text-amber-400 font-semibold shrink-0">[exec]</span>
+<span class="text-neutral-300 flex-1 min-w-0 break-words">Executing entrypoint target <span class="text-indigo-400 underline decoration-indigo-400/40">standard-workflow.yaml</span></span>
+</div>
+<!-- Server listening -->
+<div class="flex items-start space-x-2 text-neutral-400 min-w-0">
+<span class="text-neutral-600 select-none shrink-0">15:15:04.582</span>
+<span class="text-indigo-400 font-semibold shrink-0">[net]</span>
+<span class="text-neutral-300 flex-1 min-w-0 break-words">TCP server listening on <span class="text-sky-400">0.0.0.0:8080</span> · WS runtime active</span>
+</div>
+<!-- Success status check -->
+<div class="flex items-start space-x-2 text-emerald-400 min-w-0">
+<span class="text-neutral-600 select-none shrink-0">15:15:05.119</span>
+<span class="text-emerald-400 font-bold shrink-0">[ok]</span>
+<span class="text-emerald-300 flex-1 min-w-0 break-words">✔ System ready: 0 errors, 0 warnings. (Heap: <span class="text-neutral-200">48.2MB</span>, V8: <span class="text-amber-400">18ms</span>)</span>
+</div>
+<!-- Live watcher & stdout -->
+<div class="flex items-start space-x-2 text-neutral-500 pt-1 border-t border-neutral-900 min-w-0">
+<span class="text-neutral-600 select-none shrink-0">15:15:05.120</span>
+<span class="text-neutral-500 shrink-0">$</span>
+<span class="text-neutral-400 flex-1 min-w-0 break-words">Watching file tree for hot reload events [ready for input]</span>
+</div>
+<div class="flex items-start space-x-2 text-neutral-400 min-w-0">
+<span class="text-neutral-600 select-none shrink-0">15:15:06.840</span>
+<span class="text-purple-400 font-semibold shrink-0">[vite]</span>
+<span class="text-neutral-300 flex-1 min-w-0 break-words">VITE v5.2.0 page ready in <span class="text-amber-400">84ms</span></span>
+</div>
+<div class="flex items-start space-x-2 text-neutral-400 min-w-0">
+<span class="text-neutral-600 select-none shrink-0">15:15:07.012</span>
+<span class="text-sky-400 font-semibold shrink-0">[http]</span>
+<span class="text-neutral-300 flex-1 min-w-0 break-words"><span class="text-emerald-400 font-bold">GET</span> /api/healthcheck <span class="text-emerald-400">200 OK</span> - 2.1ms</span>
+</div>
+</div>
+<!-- Terminal Keyboard Accessory / Shortcut Bar (Dev friendly quick actions) -->
+<!-- Interactive Terminal Prompt Input Bar (Bottom pinned CLI with full flex wrapping containment) -->
+</main>
+<!-- Bottom Gesture Home Bar Indicator (Pinned firmly inside mobile frame) -->
+<footer class="w-full flex justify-center items-center pb-3 pt-2 bg-black shrink-0 select-none z-30" data-purpose="home-bar">
+<div class="w-32 h-1 bg-neutral-600 rounded-full"></div>
+</footer><script>window.isRunningExecution = false; function toggleExecutionState() { const btn = document.getElementById('header-play-btn'); if (!btn) return; window.isRunningExecution = !window.isRunningExecution; if (window.isRunningExecution) { btn.title = 'Stop execution'; btn.setAttribute('aria-label', 'Stop execution'); btn.className = 'w-9 h-9 flex items-center justify-center text-rose-400 hover:text-rose-300 active:opacity-60 transition-all rounded-lg'; btn.innerHTML = '<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect></svg>'; if (typeof appendTerminalLine === 'function') { appendTerminalLine('<span class="text-neutral-600 select-none shrink-0">' + getTimestamp() + '</span><span class="text-emerald-400 font-semibold shrink-0">[exec]</span><span class="text-emerald-300 flex-1 min-w-0 break-words">Pipeline started · streaming live execution</span>'); } } else { btn.title = 'Start execution'; btn.setAttribute('aria-label', 'Start execution'); btn.className = 'w-9 h-9 flex items-center justify-center text-emerald-400 hover:text-emerald-300 active:opacity-60 transition-all rounded-lg'; btn.innerHTML = '<svg class="w-5 h-5 fill-current" id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>'; if (typeof appendTerminalLine === 'function') { appendTerminalLine('<span class="text-neutral-600 select-none shrink-0">' + getTimestamp() + '</span><span class="text-amber-400 font-semibold shrink-0">[stopped]</span><span class="text-neutral-300 flex-1 min-w-0 break-words">Execution paused / stopped by user</span>'); } } }</script>
+</div>
+<!-- MODAL: Options / Workflow Selector Sheet -->
+<div class="modal-backdrop fixed inset-0 z-50 flex items-end justify-center hidden" id="workflow-modal" onclick="handleBackdropClick(event, 'workflow-modal')">
+<div class="w-full max-w-md bg-[#1d1e22] rounded-t-[32px] p-5 shadow-2xl flex flex-col max-h-[82vh] overflow-hidden border-t border-neutral-800" onclick="event.stopPropagation()">
+<div class="flex justify-between items-center pb-3 border-b border-neutral-800 shrink-0">
+<div class="flex items-center space-x-2 truncate">
+<span class="w-2 h-2 rounded-full bg-[#0070F3] inline-block"></span>
+<h3 class="text-sm font-mono font-semibold text-white truncate">Console Settings &amp; Workflows</h3>
+</div>
+<button class="p-1 text-neutral-400 hover:text-white" onclick="toggleWorkflowSheet()" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+</button>
+</div>
+<!-- List of Options / Workflows -->
+<div class="flex-1 overflow-y-auto mt-3 py-2 pr-1 space-y-2 font-mono text-xs">
+<button class="w-full p-3 rounded-xl bg-[#25272e] hover:bg-[#2d3038] text-left text-neutral-200 flex items-center justify-between border border-neutral-700/50" onclick="selectWorkflow('standard-workflow.yaml')">
+<div class="flex flex-col">
+<span class="font-medium text-white">standard-workflow.yaml</span>
+<span class="text-[10px] text-neutral-400">Default production pipeline</span>
+</div>
+<span class="text-emerald-400 text-xs">✔ Selected</span>
+</button>
+<button class="w-full p-3 rounded-xl bg-[#1f2025] hover:bg-[#25272e] text-left text-neutral-300 flex items-center justify-between" onclick="selectWorkflow('test-runner.yaml')">
+<div class="flex flex-col">
+<span>test-runner.yaml</span>
+<span class="text-[10px] text-neutral-500">Runs vitest &amp; coverage report</span>
+</div>
+</button>
+<button class="w-full p-3 rounded-xl bg-[#1f2025] hover:bg-[#25272e] text-left text-neutral-300 flex items-center justify-between" onclick="selectWorkflow('build-preview.yaml')">
+<div class="flex flex-col">
+<span>build-preview.yaml</span>
+<span class="text-[10px] text-neutral-500">Static client bundle generation</span>
+</div>
+</button>
+<div class="pt-2">
+<button class="w-full p-3 rounded-xl bg-[#1a1b1e] hover:bg-[#22242b] text-left text-rose-300 flex items-center justify-between border border-rose-500/20" onclick="triggerRestartSim(); toggleWorkflowSheet();">
+<div class="flex flex-col">
+<span class="font-medium">Force Restart Container</span>
+<span class="text-[10px] text-rose-400/80">Sends SIGTERM and reboots sandbox</span>
+</div>
+<span class="text-rose-400 text-xs font-mono">SIGTERM</span>
+</button>
+</div>
+</div>
+<div class="mt-4 flex justify-end shrink-0">
+<button class="px-5 py-2 bg-neutral-800 active:bg-neutral-700 text-xs font-mono font-medium rounded-xl text-neutral-200" onclick="toggleWorkflowSheet()">Done</button>
+</div>
+</div>
+</div>
+<!-- INTERACTIVE SCRIPTS -->
+<script data-purpose="console-interactions">
+    function getTimestamp() {
+      const d = new Date();
+      const h = String(d.getHours()).padStart(2, '0');
+      const m = String(d.getMinutes()).padStart(2, '0');
+      const s = String(d.getSeconds()).padStart(2, '0');
+      const ms = String(d.getMilliseconds()).padStart(3, '0');
+      return `${h}:${m}:${s}.${ms}`;
+    }
+
+    function scrollTerminalToBottom() {
+      const terminal = document.getElementById('terminal-body');
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function appendTerminalLine(contentHtml) {
+      const terminal = document.getElementById('terminal-body');
+      const row = document.createElement('div');
+      row.className = 'flex items-start space-x-2 text-neutral-400 min-w-0';
+      row.innerHTML = contentHtml;
+      terminal.appendChild(row);
+      scrollTerminalToBottom();
+    }
+
+    function handleCommandSubmit(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('console-cmd-input');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const ts = getTimestamp();
+
+      // Echo command
+      appendTerminalLine(`
+        <span class="text-neutral-600 select-none shrink-0">${ts}</span>
+        <span class="text-emerald-400 font-bold shrink-0">$</span>
+        <span class="text-white font-medium flex-1 min-w-0 break-words">${escapeHtml(val)}</span>
+      `);
+
+      input.value = '';
+
+      // Simulated responses
+      setTimeout(() => {
+        const respTs = getTimestamp();
+        if (val === 'clear') {
+          clearLogs();
+        } else if (val === 'git status') {
+          appendTerminalLine(`
+            <span class="text-neutral-600 select-none shrink-0">${respTs}</span>
+            <span class="text-sky-400 font-semibold shrink-0">[git]</span>
+            <span class="text-neutral-300 flex-1 min-w-0 break-words">On branch <span class="text-emerald-400">main</span> · nothing to commit, working tree clean</span>
+          `);
+        } else if (val === 'ls -la') {
+          appendTerminalLine(`
+            <span class="text-neutral-600 select-none shrink-0">${respTs}</span>
+            <span class="text-neutral-500 shrink-0">drwxr-xr-x 8 runner runner 4096 .<br/>drwxr-xr-x 3 root   root   4096 ..<br/>-rw-r--r-- 1 runner runner  342 standard-workflow.yaml<br/>drwxr-xr-x 4 runner runner 4096 src</span>
+          `);
+        } else if (val.includes('dev') || val.includes('run')) {
+          appendTerminalLine(`
+            <span class="text-neutral-600 select-none shrink-0">${respTs}</span>
+            <span class="text-emerald-400 font-semibold shrink-0">[run]</span>
+            <span class="text-neutral-200 flex-1 min-w-0 break-words">&gt; ajiro-worker@1.0.0 dev · listening at http://localhost:8080/</span>
+          `);
+        } else {
+          appendTerminalLine(`
+            <span class="text-neutral-600 select-none shrink-0">${respTs}</span>
+            <span class="text-emerald-400 font-semibold shrink-0">[ok]</span>
+            <span class="text-neutral-300 flex-1 min-w-0 break-words">Command executed successfully with exit code 0</span>
+          `);
+        }
+      }, 160);
+    }
+
+    function insertCommand(cmd) {
+      if (cmd === 'Tab') {
+        const input = document.getElementById('console-cmd-input');
+        input.value += '  ';
+        input.focus();
+        return;
+      }
+      const input = document.getElementById('console-cmd-input');
+      input.value = cmd;
+      input.focus();
+    }
+
+    function sendSigInt() {
+      const ts = getTimestamp();
+      appendTerminalLine(`
+        <span class="text-neutral-600 select-none shrink-0">${ts}</span>
+        <span class="text-rose-400 font-bold shrink-0">^C</span>
+        <span class="text-rose-300 flex-1 min-w-0 break-words">SIGINT caught · Process interrupted</span>
+      `);
+    }
+
+    function clearLogs() {
+      const terminal = document.getElementById('terminal-body');
+      terminal.innerHTML = `
+        <div class="flex items-start space-x-2 text-neutral-500 min-w-0">
+          <span class="text-neutral-600 select-none shrink-0">${getTimestamp()}</span>
+          <span class="text-neutral-500 shrink-0">[clean]</span>
+          <span class="text-neutral-400 flex-1 min-w-0 break-words">Terminal buffer cleared. Shell ready.</span>
+        </div>
+      `;
+    }
+
+    function triggerRestartSim() {
+      const restartBtn = document.getElementById('header-restart-btn');
+      if (restartBtn) {
+        restartBtn.classList.add('animate-spin');
+        setTimeout(() => restartBtn.classList.remove('animate-spin'), 750);
+      }
+      appendTerminalLine(`
+        <span class="text-neutral-600 select-none shrink-0">${getTimestamp()}</span>
+        <span class="text-amber-400 font-bold shrink-0">[restart]</span>
+        <span class="text-neutral-200 flex-1 min-w-0 break-words">SIGTERM issued. Re-spawning PID 4192 on port :8080...</span>
+      `);
+      setTimeout(() => {
+        appendTerminalLine(`
+          <span class="text-neutral-600 select-none shrink-0">${getTimestamp()}</span>
+          <span class="text-emerald-400 font-bold shrink-0">[ok]</span>
+          <span class="text-emerald-300 flex-1 min-w-0 break-words">✔ Sandbox re-initialized in 142ms. Live stream reconnected.</span>
+        `);
+      }, 500);
+    }
+
+    function toggleWorkflowSheet() {
+      const modal = document.getElementById('workflow-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    function selectWorkflow(name) {
+      appendTerminalLine(`
+        <span class="text-neutral-600 select-none shrink-0">${getTimestamp()}</span>
+        <span class="text-indigo-400 font-semibold shrink-0">[workflow]</span>
+        <span class="text-neutral-300 flex-1 min-w-0 break-words">Switched target to <span class="text-sky-300">${escapeHtml(name)}</span></span>
+      `);
+      toggleWorkflowSheet();
+    }
+
+    function handleBackdropClick(e, modalId) {
+      if (e.target.id === modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body></html>
