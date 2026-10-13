@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Editor - index.ts</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            appBlack: '#000000',
+            appCard: '#1d1e22',
+            appCardActive: '#282a30',
+            appMutedText: '#8E8E93',
+            codeBg: '#090a0d',
+            gutterBg: '#050608',
+            accentBlue: '#58a6ff',
+            syntaxKeyword: '#ff7b72',
+            syntaxString: '#a5d6ff',
+            syntaxFn: '#d2a8ff',
+            syntaxVar: '#79c0ff',
+            syntaxComment: '#6e7681',
+            syntaxNum: '#79c0ff',
+            syntaxType: '#ffa657',
+            syntaxPunct: '#c9d1d9'
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'Consolas', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+<style data-purpose="editor-styling">
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Code area scrollbar */
+    .code-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .code-scroll::-webkit-scrollbar-track {
+      background: #000000;
+    }
+    .code-scroll::-webkit-scrollbar-thumb {
+      background: #252830;
+      border-radius: 9999px;
+    }
+    .touch-target:active {
+      transform: scale(0.96);
+    }
+    .cursor-blink {
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .code-selectable {
+      user-select: text;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen bg-black text-white font-sans antialiased flex flex-col justify-between overflow-hidden selection:bg-[#264f78]">
+<!-- Mobile Edge-to-Edge Container (Max-w-md matching Files & Console screens) -->
+<div class="w-full flex-1 flex flex-col max-w-md mx-auto h-full relative overflow-hidden bg-black" id="app-root">
+<!-- Top Android Status Bar (Exact pixel-matched to Screenshot & Console) -->
+<header class="w-full px-6 pt-3 pb-1 flex items-center justify-between text-xs text-white tracking-normal font-medium shrink-0 z-30 select-none bg-black" data-purpose="status-bar">
+<!-- Left: Clock & Mail notification icon -->
+<div class="flex items-center space-x-2 text-[15px] font-semibold tracking-tight text-white">
+<span>2:51</span>
+<div class="w-4 h-4 rounded bg-[#007aff] flex items-center justify-center text-white text-[9px] font-bold">
+<svg class="w-3 h-3 text-white fill-current" viewbox="0 0 24 24">
+<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path>
+</svg>
+</div>
+</div>
+<!-- Right: Network, Cellular, Battery -->
+<div class="flex items-center space-x-2.5 text-[11px] font-medium text-neutral-200">
+<span class="flex items-center space-x-0.5 leading-none">
+<svg class="w-3 h-3 text-neutral-300" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+</svg>
+<span class="text-[9px] font-semibold leading-tight">1.60<br/><span class="text-[7.5px] font-normal">KB/s</span></span>
+</span>
+<span class="text-[10px] font-bold tracking-tighter">4G</span>
+<div class="flex items-end space-x-[2px] h-3 pb-0.5">
+<div class="w-[3px] h-1 bg-white rounded-xs"></div>
+<div class="w-[3px] h-1.5 bg-white rounded-xs"></div>
+<div class="w-[3px] h-2 bg-white rounded-xs"></div>
+<div class="w-[3px] h-2.5 bg-white rounded-xs"></div>
+</div>
+<div class="relative flex items-center justify-center bg-white text-black font-extrabold text-[9px] px-1.5 py-[1px] rounded-full min-w-[26px] h-[15px] leading-none">61</div>
+</div>
+</header>
+<!-- Top Navigation Bar (With stem arrow-left, file title, modified badge, Play/Stop toggle, Undo, Save, Overflow) -->
+<section class="w-full px-4 pt-1.5 pb-2.5 flex items-center justify-between shrink-0 z-20 border-b border-white/[0.06] bg-black" data-purpose="top-navigation">
+<div class="flex items-center space-x-3 min-w-0 flex-1 mr-2">
+<!-- Back Button (Arrow-left with stem) -->
+<button aria-label="Go back" class="p-1 text-white active:opacity-60 transition-opacity flex items-center justify-center shrink-0 touch-target" id="nav-back-btn" onclick="history.back()" type="button">
+<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24">
+<line x1="19" x2="5" y1="12" y2="12"></line>
+<polyline points="12 19 5 12 12 5"></polyline>
+</svg>
+</button>
+<!-- File Name & Modified / Lang Badge -->
+<div class="flex items-center space-x-2 min-w-0">
+<h1 class="text-[20px] font-bold tracking-tight text-white leading-none truncate font-mono" id="file-title">index.ts</h1>
+<!-- Dirty indicator dot -->
+<span class="w-2 h-2 rounded-full bg-amber-400 shrink-0" id="dirty-dot" title="Unsaved changes"></span>
+<span class="px-1.5 py-0.5 bg-[#1f2127] text-cyan-400 text-[10px] font-mono font-semibold rounded shrink-0 border border-cyan-500/20">TS</span>
+</div>
+</div>
+<!-- Header Action Controls: Containerless Play/Stop toggle, Undo, Save, More -->
+<div class="flex items-center space-x-2 shrink-0">
+<!-- Play / Stop Toggle Button (Inherited from Console screen) -->
+<button class="w-9 h-9 flex items-center justify-center text-emerald-400 hover:text-emerald-300 active:scale-95 transition-all touch-target" id="play-stop-btn" onclick="togglePlayStop()" title="Run File / Execute" type="button">
+<svg class="w-5 h-5 fill-current" id="play-icon" viewbox="0 0 24 24">
+<polygon points="6 4 20 12 6 20"></polygon>
+</svg>
+<svg class="w-5 h-5 fill-current text-rose-500 hidden" id="stop-icon" viewbox="0 0 24 24">
+<rect height="12" rx="2" width="12" x="6" y="6"></rect>
+</svg>
+</button>
+<!-- Undo Button -->
+<button class="w-9 h-9 flex items-center justify-center text-neutral-300 active:opacity-60 transition-opacity touch-target" onclick="flashFeedback('Undo action')" title="Undo" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M3 7v6h6"></path>
+<path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"></path>
+</svg>
+</button>
+<!-- Save Button (Containerless floppy disk) -->
+<button class="w-9 h-9 flex items-center justify-center text-neutral-300 active:text-white transition-colors touch-target" id="save-btn" onclick="saveFile()" title="Save file" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+<polyline points="17 21 17 13 7 13 7 21"></polyline>
+<polyline points="7 3 7 8 15 8"></polyline>
+</svg>
+</button>
+<!-- Containerless Overflow Menu -->
+<button class="w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-white transition-colors touch-target" onclick="toggleFileMenu()" title="File options" type="button">
+<svg class="w-5 h-5" fill="currentColor" viewbox="0 0 24 24">
+<circle cx="12" cy="5" r="1.5"></circle>
+<circle cx="12" cy="12" r="1.5"></circle>
+<circle cx="12" cy="19" r="1.5"></circle>
+</svg>
+</button>
+</div>
+</section>
+<!-- Breadcrumb Path Bar (Contextual hierarchy: cat-bot > src > index.ts) -->
+<div class="w-full px-4 py-1.5 bg-black text-[11px] font-mono text-neutral-400 flex items-center justify-between border-b border-white/[0.04] shrink-0">
+<div class="flex items-center space-x-1.5 truncate">
+<span class="text-[#5c7394]">cat-bot</span>
+<span class="text-neutral-600">/</span>
+<span class="text-neutral-400">src</span>
+<span class="text-neutral-600">/</span>
+<span class="text-neutral-200 font-medium">index.ts</span>
+</div>
+<div class="flex items-center space-x-2 text-[10px] text-neutral-500 shrink-0 font-mono">
+<span>UTF-8</span>
+<span>•</span>
+<span id="cursor-pos">Ln 14, Col 28</span>
+</div>
+</div>
+<!-- MAIN CODE VIEWPORT & EDITOR (Unified scrollable canvas: line numbers scroll naturally along with wrapping code) -->
+<main class="flex-1 w-full overflow-y-auto overflow-x-hidden code-scroll min-h-0 bg-black relative" data-purpose="editor-body">
+<!-- Unified scroll container with natural line numbers and word-wrapped code rows -->
+<div class="w-full flex py-3 font-mono text-[12.5px] leading-[22px] min-w-0" id="editor-wrapper">
+<!-- Non-sticky Line Numbers: in-flow alongside code, scrolls naturally with text -->
+<div class="w-10 text-neutral-600 text-right pr-2.5 select-none shrink-0 font-medium tracking-tighter" id="gutter-lines">
+<div class="h-[22px]">1</div>
+<div class="h-[22px]">2</div>
+<div class="h-[44px]">3</div>
+<div class="h-[22px]">4</div>
+<div class="h-[22px]">5</div>
+<div class="h-[22px]">6</div>
+<div class="h-[22px]">7</div>
+<div class="h-[22px]">8</div>
+<div class="h-[22px]">9</div>
+<div class="h-[22px]">10</div>
+<div class="h-[22px]">11</div>
+<div class="h-[22px]">12</div>
+<div class="h-[22px]">13</div>
+<div class="h-[44px] text-cyan-400 font-bold">14</div>
+<div class="h-[22px]">15</div>
+<div class="h-[22px]">16</div>
+<div class="h-[22px]">17</div>
+<div class="h-[22px]">18</div>
+<div class="h-[22px]">19</div>
+<div class="h-[22px]">20</div>
+<div class="h-[22px]">21</div>
+<div class="h-[22px]">22</div>
+<div class="h-[22px]">23</div>
+<div class="h-[22px]">24</div>
+<div class="h-[22px]">25</div>
+</div>
+<!-- Code Content with Soft Wrapping / Break Words (no fixed gutter separation, flows and wraps naturally) -->
+<div class="flex-1 min-w-0 pr-3 pl-2 text-neutral-200 border-l border-white/[0.06] whitespace-pre-wrap break-words code-selectable" contenteditable="true" id="code-content" spellcheck="false" style="word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;"><span class="text-neutral-500">// Wataru Agent Runtime - Entrypoint</span>
+<span class="text-[#ff7b72]">import</span> { createServer, IncomingMessage, ServerResponse } <span class="text-[#ff7b72]">from</span> <span class="text-[#a5d6ff]">"http"</span>;
+<span class="text-[#ff7b72]">import</span> { appRouter } <span class="text-[#ff7b72]">from</span> <span class="text-[#a5d6ff]">"./routes/agent"</span>;
+<span class="text-[#ff7b72]">import</span> { dbPool } <span class="text-[#ff7b72]">from</span> <span class="text-[#a5d6ff]">"../database/client"</span>;
+<span class="text-[#ff7b72]">import</span> { Logger } <span class="text-[#ff7b72]">from</span> <span class="text-[#a5d6ff]">"./utils/logger"</span>;
+
+<span class="text-[#ff7b72]">const</span> <span class="text-[#79c0ff]">PORT</span> = Number(process.env.<span class="text-[#79c0ff]">PORT</span>) || <span class="text-[#79c0ff]">8080</span>;
+<span class="text-[#ff7b72]">const</span> <span class="text-[#79c0ff]">logger</span> = <span class="text-[#ff7b72]">new</span> <span class="text-[#ffa657]">Logger</span>({ service: <span class="text-[#a5d6ff]">"agent-core"</span> });
+
+<span class="text-[#ff7b72]">async</span> <span class="text-[#ff7b72]">function</span> <span class="text-[#d2a8ff]">bootstrap</span>(): <span class="text-[#ffa657]">Promise</span>&lt;<span class="text-[#79c0ff]">void</span>&gt; {
+  <span class="text-[#79c0ff]">logger</span>.<span class="text-[#d2a8ff]">info</span>(<span class="text-[#a5d6ff]">"Connecting to primary Postgres pool..."</span>);
+  <span class="text-[#ff7b72]">await</span> <span class="text-[#79c0ff]">dbPool</span>.<span class="text-[#d2a8ff]">connect</span>();
+
+  <span class="text-[#ff7b72]">const</span> <span class="text-[#79c0ff]">server</span> = <span class="text-[#d2a8ff]">createServer</span>((<span class="text-[#79c0ff]">req</span>, <span class="text-[#79c0ff]">res</span>) =&gt; {
+    <span class="text-[#ff7b72]">return</span> <span class="text-[#d2a8ff]">appRouter</span>(<span class="text-[#79c0ff]">req</span>, <span class="text-[#79c0ff]">res</span>);<span class="inline-block w-[2px] h-[15px] bg-cyan-400 cursor-blink align-middle ml-0.5"></span>
+  });
+
+  <span class="text-[#79c0ff]">server</span>.<span class="text-[#d2a8ff]">listen</span>(<span class="text-[#79c0ff]">PORT</span>, () =&gt; {
+    <span class="text-[#79c0ff]">logger</span>.<span class="text-[#d2a8ff]">ready</span>(<span class="text-[#a5d6ff]">`Sandbox server listening on :${PORT}`</span>);
+  });
+}
+
+<span class="text-[#d2a8ff]">bootstrap</span>().<span class="text-[#d2a8ff]">catch</span>((<span class="text-[#79c0ff]">err</span>) =&gt; {
+  <span class="text-[#79c0ff]">logger</span>.<span class="text-[#d2a8ff]">fatal</span>(<span class="text-[#a5d6ff]">"Fatal bootstrap failed:"</span>, <span class="text-[#79c0ff]">err</span>);
+  process.<span class="text-[#d2a8ff]">exit</span>(<span class="text-[#79c0ff]">1</span>);
+});</div>
+</div>
+<!-- Execution Floating Status Badge (Appears when code is running) -->
+<div class="hidden fixed top-24 right-5 bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 px-2.5 py-1 rounded-full text-[11px] font-mono flex items-center space-x-1.5 backdrop-blur-md shadow-lg animate-pulse z-30" id="execution-badge">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span>Running :8080</span>
+</div>
+</main>
+<!-- Mobile Developer Quick Accessory Key Bar (Essential touch keys for coding: Tab, Quotes, Brackets, Arrows) -->
+<!-- Native Gesture Bottom Indicator Bar -->
+<footer class="w-full flex justify-center items-center pt-2 pb-2 bg-black shrink-0" data-purpose="home-bar">
+<div class="w-36 h-1 bg-neutral-600 rounded-full"></div>
+</footer>
+</div>
+<!-- MODAL: Overflow Menu Sheet -->
+<div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end justify-center hidden" id="file-menu-modal" onclick="toggleFileMenu()">
+<div class="w-full max-w-md bg-[#1d1e22] rounded-t-[32px] p-5 border-t border-neutral-800 shadow-2xl" onclick="event.stopPropagation()">
+<div class="flex justify-between items-center pb-3 border-b border-neutral-800">
+<div class="flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+<h3 class="text-sm font-mono font-semibold text-white">index.ts Options</h3>
+</div>
+<button class="p-1 text-neutral-400 hover:text-white" onclick="toggleFileMenu()">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+</button>
+</div>
+<div class="py-3 space-y-1.5 font-mono text-xs">
+<button class="w-full py-2.5 px-3 rounded-xl bg-[#25272e] hover:bg-[#2e323b] text-left text-neutral-200 flex items-center justify-between" onclick="flashFeedback('Formatted document'); toggleFileMenu();">
+<span>Format Document (Prettier)</span>
+<span class="text-neutral-500 text-[10px]">Shift+Alt+F</span>
+</button>
+<button class="w-full py-2.5 px-3 rounded-xl bg-[#25272e] hover:bg-[#2e323b] text-left text-neutral-200 flex items-center justify-between" onclick="flashFeedback('Find in File opened'); toggleFileMenu();">
+<span>Find in File</span>
+<span class="text-neutral-500 text-[10px]">Ctrl+F</span>
+</button>
+<button class="w-full py-2.5 px-3 rounded-xl bg-[#25272e] hover:bg-[#2e323b] text-left text-neutral-200 flex items-center justify-between" onclick="flashFeedback('Navigating to Console logs'); toggleFileMenu();">
+<span>View in Console Output</span>
+<span class="text-neutral-500 text-[10px]">&gt;_</span>
+</button>
+<button class="w-full py-2.5 px-3 rounded-xl bg-[#25272e] hover:bg-[#2e323b] text-left text-neutral-200 flex items-center justify-between" onclick="flashFeedback('Git Diff view'); toggleFileMenu();">
+<span>Git Diff with main</span>
+<span class="text-amber-400 text-[10px]">• Modified</span>
+</button>
+<button class="w-full py-2.5 px-3 rounded-xl bg-neutral-800 text-center text-neutral-300 mt-2 font-medium" onclick="toggleFileMenu()">
+          Close
+        </button>
+</div>
+</div>
+</div>
+<!-- Toast Notification Overlay -->
+<div class="fixed top-12 left-1/2 -translate-x-1/2 bg-[#25272d] text-white text-xs font-mono px-4 py-2 rounded-full border border-neutral-700/80 shadow-2xl transition-all duration-200 opacity-0 pointer-events-none z-50 flex items-center space-x-2" id="toast">
+<span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+<span id="toast-text">Saved</span>
+</div>
+<!-- INTERACTIVE SCRIPTS -->
+<script data-purpose="editor-interactions">
+    let isRunning = false;
+
+    // Toggle Play / Stop button (reusing functionality from Console screen)
+    function togglePlayStop() {
+      isRunning = !isRunning;
+      const playIcon = document.getElementById('play-icon');
+      const stopIcon = document.getElementById('stop-icon');
+      const execBadge = document.getElementById('execution-badge');
+      const playStopBtn = document.getElementById('play-stop-btn');
+
+      if (isRunning) {
+        playIcon.classList.add('hidden');
+        stopIcon.classList.remove('hidden');
+        execBadge.classList.remove('hidden');
+        playStopBtn.title = "Stop Execution";
+        flashFeedback("Executing index.ts...");
+      } else {
+        stopIcon.classList.add('hidden');
+        playIcon.classList.remove('hidden');
+        execBadge.classList.add('hidden');
+        playStopBtn.title = "Run File / Execute";
+        flashFeedback("Process terminated");
+      }
+    }
+
+    function saveFile() {
+      const dirtyDot = document.getElementById('dirty-dot');
+      dirtyDot.classList.add('opacity-0');
+      flashFeedback("Saved index.ts (24 lines)");
+    }
+
+    function insertChar(char) {
+      document.execCommand('insertText', false, char);
+      const dirtyDot = document.getElementById('dirty-dot');
+      dirtyDot.classList.remove('opacity-0');
+    }
+
+    function toggleFileMenu() {
+      const modal = document.getElementById('file-menu-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    function flashFeedback(msg) {
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toast-text');
+      toastText.innerText = msg;
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 1800);
+    }
+  </script>
+</body></html>
