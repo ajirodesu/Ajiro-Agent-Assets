@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Files - Empty State</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            appBlack: '#000000',
+            appCard: '#1d1e22',
+            appCardHover: '#26282e',
+            appCardActive: '#2c2e35',
+            appSectionHeader: '#5c7394',
+            appMuted: '#9e9e9e',
+            appBorder: '#2e3036',
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    /* Hide scrollbars cleanly */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    html, body {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen w-full bg-black text-white font-sans antialiased flex flex-col justify-between selection:bg-neutral-800">
+<!-- BEGIN: MobileContainer -->
+<div class="w-full flex-1 flex flex-col max-w-md mx-auto min-h-screen px-0 pb-3 relative overflow-hidden">
+<!-- BEGIN: StatusBar -->
+<header class="w-full px-6 pt-3 pb-2 flex items-center justify-between text-xs text-white tracking-normal font-medium shrink-0" data-purpose="status-bar">
+<!-- Time and App Notification icon -->
+<div class="flex items-center space-x-2 text-[15px] font-semibold tracking-tight text-white">
+<span>2:51</span>
+<div class="w-4 h-4 rounded bg-[#007aff] flex items-center justify-center text-white text-[9px] font-bold">
+<svg class="w-2.5 h-2.5 text-white fill-current" viewbox="0 0 24 24">
+<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path>
+</svg>
+</div>
+</div>
+<!-- Network, Signal, Battery Indicators -->
+<div class="flex items-center space-x-2.5 text-[11px] font-medium text-neutral-200">
+<span class="flex items-center space-x-0.5 leading-none">
+<svg class="w-3 h-3 text-neutral-300" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+</svg>
+<span class="text-[9px] font-semibold leading-tight">1.60<br/><span class="text-[7.5px] font-normal">KB/s</span></span>
+</span>
+<span class="text-[10px] font-bold tracking-tighter">4G</span>
+<div class="flex items-end space-x-[2px] h-3 pb-0.5">
+<div class="w-[3px] h-1 bg-white rounded-xs"></div>
+<div class="w-[3px] h-1.5 bg-white rounded-xs"></div>
+<div class="w-[3px] h-2 bg-white rounded-xs"></div>
+<div class="w-[3px] h-2.5 bg-white rounded-xs"></div>
+</div>
+<div class="relative flex items-center justify-center bg-white text-black font-extrabold text-[9px] px-1.5 py-[1px] rounded-full min-w-[26px] h-[15px] leading-none">
+          61
+        </div>
+</div>
+</header>
+<!-- END: StatusBar -->
+<!-- BEGIN: TopNavigation -->
+<div class="w-full px-5 pt-2 pb-3 flex items-center justify-between shrink-0" data-purpose="top-navigation">
+<div class="flex items-center space-x-4 min-w-0">
+<button aria-label="Go back" class="p-1 text-white active:opacity-70 transition-opacity flex items-center justify-center shrink-0" onclick="history.back()" type="button">
+<svg class="w-6 h-6 text-white stroke-[2.4]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<line x1="19" x2="5" y1="12" y2="12"></line>
+<polyline points="12 19 5 12 12 5"></polyline>
+</svg>
+</button>
+<div class="flex items-center space-x-2.5 truncate">
+<h1 class="text-[26px] font-bold tracking-tight text-white leading-none">Files</h1>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-[#25272d] text-neutral-300 border border-[#32353d]">
+<span class="w-1.5 h-1.5 rounded-full bg-neutral-400 mr-1.5"></span>empty
+</span>
+</div>
+</div>
+<div class="flex items-center space-x-3 shrink-0">
+<div class="w-9 h-9 rounded-full flex items-center justify-center text-neutral-400 opacity-60 cursor-not-allowed" title="Git">
+<svg class="w-6 h-6 stroke-[1.9]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<line x1="6" x2="6" y1="3" y2="15"></line>
+<circle cx="18" cy="6" r="3"></circle>
+<circle cx="6" cy="18" r="3"></circle>
+<path d="M18 9a9 9 0 0 1-9 9"></path>
+</svg>
+</div>
+<button class="w-9 h-9 flex items-center justify-center text-white active:opacity-60 transition-opacity" onclick="openCreateModal()" title="New file or project">
+<svg class="w-7 h-7 stroke-[2.2]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<line x1="12" x2="12" y1="5" y2="19"></line>
+<line x1="5" x2="19" y1="12" y2="12"></line>
+</svg>
+</button>
+</div>
+</div>
+<!-- END: TopNavigation -->
+<!-- BEGIN: SearchBar (Disabled/Placeholder state for empty workspace) -->
+<div class="w-full px-4 mb-3 shrink-0" data-purpose="search-bar">
+<div class="relative w-full h-11 bg-[#1a1b1f] rounded-[22px] flex items-center text-neutral-400">
+<div class="absolute left-3.5 flex items-center pointer-events-none text-neutral-500">
+<svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+</div>
+<input class="bg-transparent text-xs w-full pl-10 pr-4 outline-none text-neutral-200 placeholder-neutral-500 font-mono border-0 focus:ring-0" disabled="" placeholder="Search files and code..." type="text"/>
+</div>
+</div>
+<!-- END: SearchBar -->
+<!-- BEGIN: MainContent (Empty State & Core Actions) -->
+<main class="w-full px-4 flex-1 flex flex-col overflow-y-auto space-y-6 pb-6" data-purpose="empty-workspace-content">
+<div class="w-full flex flex-col space-y-6">
+<!-- Section 1: Get Started -->
+<section class="w-full flex flex-col">
+<h2 class="text-[13px] font-medium text-[#5c7394] px-3 mb-[8px] tracking-wide uppercase font-sans">
+Get Started
+</h2>
+<div class="w-full flex flex-col space-y-[3px]">
+<!-- Select Project Folder -->
+<div class="w-full h-[64px] px-4 bg-[#1d1e22] hover:bg-[#24262c] active:bg-[#282a30] rounded-t-[26px] rounded-b-[4px] flex items-center justify-between transition-colors cursor-pointer group" onclick="triggerAction('folder')" role="button" tabindex="0">
+<div class="flex items-center space-x-3.5 min-w-0">
+<div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+<svg class="w-5 h-5 stroke-[1.9]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+</svg>
+</div>
+<div class="flex flex-col min-w-0 text-left">
+<span class="text-[15px] font-mono font-medium text-white tracking-tight truncate">Select Project Folder</span>
+<span class="text-[11px] text-neutral-400 font-mono truncate">Open existing local workspace</span>
+</div>
+</div>
+<div class="text-neutral-500 pl-2 shrink-0 group-hover:text-neutral-300 transition-colors">
+<svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<polyline points="9 18 15 12 9 6"></polyline>
+</svg>
+</div>
+</div>
+<!-- Git Clone Repository -->
+<div class="w-full h-[64px] px-4 bg-[#1d1e22] hover:bg-[#24262c] active:bg-[#282a30] rounded-t-[4px] rounded-b-[26px] flex items-center justify-between transition-colors cursor-pointer group" onclick="triggerAction('clone')" role="button" tabindex="0">
+<div class="flex items-center space-x-3.5 min-w-0">
+<div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+<svg class="w-5 h-5 stroke-[1.9]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<line x1="6" x2="6" y1="3" y2="15"></line>
+<circle cx="18" cy="6" r="3"></circle>
+<circle cx="6" cy="18" r="3"></circle>
+<path d="M18 9a9 9 0 0 1-9 9"></path>
+</svg>
+</div>
+<div class="flex flex-col min-w-0 text-left">
+<span class="text-[15px] font-mono font-medium text-white tracking-tight truncate">Git Clone Repository</span>
+<span class="text-[11px] text-neutral-400 font-mono truncate">Clone via HTTPS or SSH remote URL</span>
+</div>
+</div>
+<div class="text-neutral-500 pl-2 shrink-0 group-hover:text-neutral-300 transition-colors">
+<svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<polyline points="9 18 15 12 9 6"></polyline>
+</svg>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Quick Start -->
+<section class="w-full flex flex-col pt-1">
+<h2 class="text-[13px] font-medium text-[#5c7394] px-3 mb-[8px] tracking-wide uppercase font-sans">
+Quick Start
+</h2>
+<div class="w-full flex flex-col space-y-[3px]">
+<!-- New File -->
+<div class="w-full h-[64px] px-4 bg-[#1d1e22] hover:bg-[#24262c] active:bg-[#282a30] rounded-t-[26px] rounded-b-[4px] flex items-center justify-between transition-colors cursor-pointer group" onclick="triggerAction('newfile')" role="button" tabindex="0">
+<div class="flex items-center space-x-3.5 min-w-0">
+<div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+<svg class="w-5 h-5 stroke-[1.9]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+<polyline points="14 2 14 8 20 8"></polyline>
+</svg>
+</div>
+<div class="flex flex-col min-w-0 text-left">
+<span class="text-[15px] font-mono font-medium text-white tracking-tight truncate">New File</span>
+<span class="text-[11px] text-neutral-400 font-mono truncate">Create empty file</span>
+</div>
+</div>
+<span class="text-[12px] font-mono text-neutral-400 pl-2 shrink-0">Ctrl+N</span>
+</div>
+<!-- New Folder -->
+<div class="w-full h-[64px] px-4 bg-[#1d1e22] hover:bg-[#24262c] active:bg-[#282a30] rounded-[4px] flex items-center justify-between transition-colors cursor-pointer group" onclick="triggerAction('newfolder')" role="button" tabindex="0">
+<div class="flex items-center space-x-3.5 min-w-0">
+<div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+<svg class="w-5 h-5 stroke-[1.9]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+</svg>
+</div>
+<div class="flex flex-col min-w-0 text-left">
+<span class="text-[15px] font-mono font-medium text-white tracking-tight truncate">New Folder</span>
+<span class="text-[11px] text-neutral-400 font-mono truncate">Create empty directory</span>
+</div>
+</div>
+<span class="text-[12px] font-mono text-neutral-400 pl-2 shrink-0">Ctrl+Shift+N</span>
+</div>
+<!-- Scaffold Project Template -->
+<div class="w-full h-[64px] px-4 bg-[#1d1e22] hover:bg-[#24262c] active:bg-[#282a30] rounded-t-[4px] rounded-b-[26px] flex items-center justify-between transition-colors cursor-pointer group" onclick="triggerAction('template')" role="button" tabindex="0">
+<div class="flex items-center space-x-3.5 min-w-0">
+<div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+<svg class="w-5 h-5 stroke-[1.9]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<polyline points="16 18 22 12 16 6"></polyline>
+<polyline points="8 6 2 12 8 18"></polyline>
+</svg>
+</div>
+<div class="flex flex-col min-w-0 text-left">
+<span class="text-[15px] font-mono font-medium text-white tracking-tight truncate">Scaffold Project</span>
+<span class="text-[11px] text-neutral-400 font-mono truncate">Node, Python, Rust templates</span>
+</div>
+</div>
+<span class="text-[12px] font-mono text-neutral-400 pl-2 shrink-0">Template</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Subtle Empty Workspace Status Notice -->
+<div class="py-6 flex flex-col items-center justify-center text-center opacity-70 mt-auto">
+<div class="w-10 h-10 rounded-full bg-[#16171b] border border-[#26282e] flex items-center justify-center mb-2.5 text-neutral-500">
+<svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+<polyline points="13 2 13 9 20 9"></polyline>
+</svg>
+</div>
+<p class="text-xs text-neutral-400 font-sans font-medium">No active workspace loaded</p>
+<p class="text-[11px] text-neutral-500 font-mono mt-0.5">Select a folder or clone a repository to get started</p>
+</div>
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: GestureHomeIndicator -->
+<footer class="w-full flex justify-center items-center pt-3 pb-3 shrink-0" data-purpose="home-bar">
+<div class="w-36 h-1 bg-neutral-600 rounded-full"></div>
+</footer>
+<!-- END: GestureHomeIndicator -->
+<!-- BEGIN: ActionModal (Interactive sheet for Folder / Clone / Create actions) -->
+<div class="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs hidden flex items-end sm:items-center justify-center p-3 transition-opacity" id="action-modal">
+<div class="w-full max-w-sm bg-[#1e2025] border border-[#32353e] rounded-[30px] p-5 shadow-2xl transform transition-transform translate-y-6" id="modal-card">
+<div class="flex items-center justify-between pb-3 border-b border-[#2d3038] mb-4">
+<div class="flex items-center space-x-2.5">
+<span class="text-neutral-300" id="modal-icon"></span>
+<h3 class="text-[16px] font-bold text-white tracking-tight" id="modal-title">Dialog</h3>
+</div>
+<button class="w-8 h-8 rounded-full bg-[#272931] flex items-center justify-center text-neutral-400 hover:text-white transition-colors" onclick="closeModal()">
+<svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewbox="0 0 24 24">
+<line x1="18" x2="6" y1="6" y2="18"></line>
+<line x1="6" x2="18" y1="6" y2="18"></line>
+</svg>
+</button>
+</div>
+<div class="flex flex-col space-y-4" id="modal-body">
+<!-- Dynamic content populated by JS -->
+</div>
+</div>
+</div>
+<!-- END: ActionModal -->
+</div>
+<!-- END: MobileContainer -->
+<script>
+    const modal = document.getElementById('action-modal');
+    const modalCard = document.getElementById('modal-card');
+    const modalTitle = document.getElementById('modal-title');
+    const modalIcon = document.getElementById('modal-icon');
+    const modalBody = document.getElementById('modal-body');
+
+    function openModal() {
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modalCard.classList.remove('translate-y-6');
+      }, 10);
+    }
+
+    function closeModal() {
+      modalCard.classList.add('translate-y-6');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 150);
+    }
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    function triggerAction(actionType) {
+      if (actionType === 'folder') {
+        modalTitle.innerText = 'Select Project Folder';
+        modalIcon.innerHTML = `<svg class="w-5 h-5 text-neutral-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>`;
+        modalBody.innerHTML = `
+          <p class="text-xs text-neutral-400">Choose a local folder from your device filesystem to open as current workspace.</p>
+          <div class="p-3 bg-[#17181c] rounded-2xl border border-[#2b2d35] font-mono text-xs text-neutral-300 flex items-center justify-between">
+            <span class="truncate">/storage/emulated/0/Projects/</span>
+            <span class="text-neutral-500 text-[10px]">DIR</span>
+          </div>
+          <button onclick="simulateWorkspaceLoaded('my-local-project')" class="w-full py-3 bg-white text-black font-semibold rounded-2xl text-sm active:opacity-80 transition-opacity">
+            Confirm Folder Selection
+          </button>
+        `;
+        openModal();
+      } else if (actionType === 'clone') {
+        modalTitle.innerText = 'Git Clone Repository';
+        modalIcon.innerHTML = `<svg class="w-5 h-5 text-neutral-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="6" x2="6" y1="3" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>`;
+        modalBody.innerHTML = `
+          <p class="text-xs text-neutral-400">Enter repository URL to clone into an empty workspace directory.</p>
+          <div class="space-y-2">
+            <label class="text-[11px] font-mono text-[#5c7394] uppercase tracking-wider">Repository URL</label>
+            <input type="text" class="w-full h-11 bg-[#17181c] border border-[#2b2d35] rounded-xl px-3 text-xs font-mono text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-400" placeholder="https://github.com/user/repo.git" value="https://github.com/wataru/agent-core.git" />
+          </div>
+          <button onclick="simulateWorkspaceLoaded('agent-core')" class="w-full py-3 bg-white text-black font-semibold rounded-2xl text-sm active:opacity-80 transition-opacity">
+            Start Cloning
+          </button>
+        `;
+        openModal();
+      } else if (actionType === 'newfile') {
+        modalTitle.innerText = 'New File';
+        modalIcon.innerHTML = `<svg class="w-5 h-5 text-neutral-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>`;
+        modalBody.innerHTML = `
+          <div class="space-y-2">
+            <label class="text-[11px] font-mono text-[#5c7394] uppercase tracking-wider">File Name</label>
+            <input type="text" class="w-full h-11 bg-[#17181c] border border-[#2b2d35] rounded-xl px-3 text-xs font-mono text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-400" placeholder="main.ts or README.md" value="index.ts" />
+          </div>
+          <button onclick="closeModal()" class="w-full py-3 bg-white text-black font-semibold rounded-2xl text-sm active:opacity-80 transition-opacity">
+            Create & Open File
+          </button>
+        `;
+        openModal();
+      } else if (actionType === 'newfolder') {
+        modalTitle.innerText = 'New Folder';
+        modalIcon.innerHTML = `<svg class="w-5 h-5 text-neutral-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
+        modalBody.innerHTML = `
+          <div class="space-y-2">
+            <label class="text-[11px] font-mono text-[#5c7394] uppercase tracking-wider">Folder Name</label>
+            <input type="text" class="w-full h-11 bg-[#17181c] border border-[#2b2d35] rounded-xl px-3 text-xs font-mono text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-400" placeholder="src or components" value="src" />
+          </div>
+          <button onclick="closeModal()" class="w-full py-3 bg-white text-black font-semibold rounded-2xl text-sm active:opacity-80 transition-opacity">
+            Create Folder
+          </button>
+        `;
+        openModal();
+      } else if (actionType === 'template') {
+        modalTitle.innerText = 'Starter Template';
+        modalIcon.innerHTML = `<svg class="w-5 h-5 text-neutral-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect></svg>`;
+        modalBody.innerHTML = `
+          <p class="text-xs text-neutral-400 mb-2">Select a project stack to scaffold instantly:</p>
+          <div class="space-y-2">
+            <button onclick="simulateWorkspaceLoaded('vite-react-app')" class="w-full p-3 bg-[#17181c] hover:bg-[#252830] rounded-xl border border-[#2b2d35] flex items-center justify-between text-left transition-colors">
+              <span class="text-xs font-mono text-white">TypeScript + Node.js</span>
+              <span class="text-[11px] text-[#5c7394]">Quickstart</span>
+            </button>
+            <button onclick="simulateWorkspaceLoaded('python-agent')" class="w-full p-3 bg-[#17181c] hover:bg-[#252830] rounded-xl border border-[#2b2d35] flex items-center justify-between text-left transition-colors">
+              <span class="text-xs font-mono text-white">Python 3 + venv</span>
+              <span class="text-[11px] text-[#5c7394]">Agent Setup</span>
+            </button>
+          </div>
+        `;
+        openModal();
+      }
+    }
+
+    function openCreateModal() {
+      triggerAction('newfile');
+    }
+
+    function simulateWorkspaceLoaded(name) {
+      closeModal();
+    }
+  </script>
+</body>
+</html>
