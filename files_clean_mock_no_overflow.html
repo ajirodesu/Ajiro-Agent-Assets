@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>Files - Interactive Working Mock</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            appBlack: '#000000',
+            appCard: '#1d1e22',
+            appCardActive: '#282a30',
+            appSectionHeader: '#5c7394',
+            appMutedText: '#8E8E93',
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', sans-serif],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <style data-purpose="custom-styling">
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      width: 100vw;
+      min-height: 100vh;
+    }
+    /* Clean custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2b2c30;
+      border-radius: 9999px;
+    }
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body class="min-h-screen w-full bg-black text-white font-sans antialiased flex flex-col justify-between overflow-x-hidden selection:bg-neutral-800">
+
+  <!-- Mobile Edge-to-Edge Container (Max-w-md centered for preview with no outer frame/bezels) -->
+  <div class="w-full flex-1 flex flex-col max-w-md mx-auto min-h-screen relative overflow-x-hidden" id="app-root">
+
+    <!-- Top Status Bar (Matching Screenshot) -->
+    <header class="w-full px-6 pt-3 pb-1 flex items-center justify-between text-xs text-white tracking-normal font-medium shrink-0 z-30" data-purpose="status-bar">
+      <div class="flex items-center space-x-2 text-[15px] font-semibold tracking-tight text-white">
+        <span>2:51</span>
+        <div class="w-4 h-4 rounded bg-[#007aff] flex items-center justify-center text-white text-[9px] font-bold">
+          <svg class="w-3 h-3 text-white fill-current" viewBox="0 0 24 24">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2.5 text-[11px] font-medium text-neutral-200">
+        <span class="flex items-center space-x-0.5 leading-none">
+          <svg class="w-3 h-3 text-neutral-300" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"></path>
+          </svg>
+          <span class="text-[9px] font-semibold leading-tight">1.60<br/><span class="text-[7.5px] font-normal">KB/s</span></span>
+        </span>
+        <span class="text-[10px] font-bold tracking-tighter">4G</span>
+        <div class="flex items-end space-x-[2px] h-3 pb-0.5">
+          <div class="w-[3px] h-1 bg-white rounded-xs"></div>
+          <div class="w-[3px] h-1.5 bg-white rounded-xs"></div>
+          <div class="w-[3px] h-2 bg-white rounded-xs"></div>
+          <div class="w-[3px] h-2.5 bg-white rounded-xs"></div>
+        </div>
+        <div class="relative flex items-center justify-center bg-white text-black font-extrabold text-[9px] px-1.5 py-[1px] rounded-full min-w-[26px] h-[15px] leading-none">61</div>
+      </div>
+    </header>
+
+    <!-- Top Navigation Bar -->
+    <section class="w-full px-5 pt-2 pb-3 flex items-center justify-between shrink-0 z-20" data-purpose="top-navigation">
+      <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+        <!-- Back Button (arrow-left with stem) -->
+        <button id="nav-back-btn" onclick="navigateBack()" aria-label="Go back" class="p-1 text-white active:opacity-60 transition-opacity flex items-center justify-center shrink-0" type="button">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewBox="0 0 24 24">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+        <!-- Page Title & Branch Badge -->
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <h1 id="page-title" class="text-[26px] font-bold tracking-tight text-white leading-none truncate">Files</h1>
+          <span id="branch-badge" class="px-2 py-0.5 bg-[#25272d] text-neutral-300 text-[11px] font-medium rounded-full flex items-center space-x-1 shrink-0 border border-neutral-700/50">
+            <span class="w-1.5 h-1.5 rounded-full bg-neutral-300 inline-block"></span>
+            <span class="font-mono text-[10px]">main</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Action Icons (Git as Placeholder + Containerless '+' button) -->
+      <div class="flex items-center space-x-2 shrink-0">
+        <!-- Git Placeholder Icon (Non-overflowing, clean placeholder badge/icon) -->
+        <div class="relative group" title="Git (Coming Soon)">
+          <div class="w-9 h-9 flex items-center justify-center text-neutral-400 opacity-60 cursor-default select-none rounded-full" aria-label="Git placeholder">
+            <!-- Git Branch Vector Icon -->
+            <svg class="w-[20px] h-[20px]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="6" y1="3" x2="6" y2="15"></line>
+              <circle cx="18" cy="6" r="3"></circle>
+              <circle cx="6" cy="18" r="3"></circle>
+              <path d="M18 9a9 9 0 0 1-9 9"></path>
+            </svg>
+          </div>
+          <!-- Subtle tooltip indicator -->
+          <span class="pointer-events-none absolute -bottom-6 right-0 scale-0 transition-transform group-hover:scale-100 bg-[#222] text-neutral-300 text-[9px] px-1.5 py-0.5 rounded shadow-lg whitespace-nowrap z-30 font-mono">
+            Git
+          </span>
+        </div>
+
+        <!-- Containerless '+' Button (Material Design 3 Icon Action) -->
+        <button onclick="openCreateModal()" class="w-9 h-9 flex items-center justify-center text-white active:opacity-60 transition-opacity p-0" title="Create new file or folder" type="button">
+          <svg class="w-7 h-7 text-white stroke-[2.2]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Search Bar (Pill Container) -->
+    <section class="w-full px-4 mb-3 shrink-0" data-purpose="search-bar">
+      <div class="relative w-full flex items-center">
+        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+          <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="16.65" x2="16.65" y2="21"></line>
+          </svg>
+        </div>
+        <input id="search-input" oninput="handleSearch(this.value)" class="w-full h-11 bg-[#1a1b1f] border-0 rounded-[22px] pl-10 pr-4 text-xs font-mono text-neutral-200 placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-600 transition-all truncate" placeholder="Search files and code" type="text"/>
+      </div>
+    </section>
+
+    <!-- Breadcrumb Indicator (Visible when inside a folder) -->
+    <div id="breadcrumb-bar" class="hidden px-5 py-1 mb-2 text-xs font-mono text-neutral-400 flex items-center space-x-1.5 truncate shrink-0">
+      <span onclick="navigateToRoot()" class="hover:text-white cursor-pointer underline underline-offset-2">root</span>
+      <span class="text-neutral-600">/</span>
+      <span id="breadcrumb-current" class="text-neutral-200 font-medium truncate">database</span>
+    </div>
+
+    <!-- MAIN SCROLLABLE CONTENT (Controlled flex scrolling, no overflow bugs) -->
+    <main class="w-full px-4 flex-1 overflow-y-auto overflow-x-hidden min-h-0 pb-6 space-y-6" id="files-scroll-container">
+
+      <!-- VIEW 1: ROOT DIRECTORY -->
+      <div id="root-view" class="w-full flex flex-col space-y-6">
+
+        <!-- SECTION: Pinned Files -->
+        <section class="w-full flex flex-col" data-section="pinned">
+          <h2 class="text-[13px] font-medium text-[#5c7394] px-3 mb-[8px] tracking-wide">Pinned Files</h2>
+          <div class="w-full flex flex-col space-y-[3px]">
+            <!-- Top Card: index.ts -->
+            <div onclick="openPreview('index.ts', 'typescript')" class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-t-[26px] rounded-b-[4px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <!-- Monochrome Document Icon -->
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[15px] font-mono font-medium text-white truncate">index.ts</span>
+                  <span class="text-[11px] font-mono text-neutral-400 truncate">Main application entry</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 shrink-0">
+                <span class="text-[12px] font-mono text-neutral-400">4.2 KB</span>
+              </div>
+            </div>
+
+            <!-- Bottom Card: README.md -->
+            <div onclick="openPreview('README.md', 'markdown')" class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-t-[4px] rounded-b-[26px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[15px] font-mono font-medium text-white truncate">README.md</span>
+                  <span class="text-[11px] font-mono text-neutral-400 truncate">Documentation & setup</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 shrink-0">
+                <span class="text-[12px] font-mono text-neutral-400">root</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: Workspace Files (With 3px gap & matched curveness) -->
+        <section class="w-full flex flex-col" data-section="workspace">
+          <h2 class="text-[13px] font-medium text-[#5c7394] px-3 mb-[8px] tracking-wide">Workspace Files</h2>
+          <div class="w-full flex flex-col space-y-[3px]" id="workspace-list">
+            <!-- 1. Top Folder: .agents -->
+            <div class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-t-[26px] rounded-b-[4px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <span class="text-[15px] font-mono font-medium text-white truncate">.agents</span>
+              </div>
+              <div class="flex items-center space-x-2 text-neutral-400 shrink-0">
+                <span class="text-[12px] font-mono">3 items</span>
+                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+
+            <!-- 2. Middle Folder: .config -->
+            <div class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-[4px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <span class="text-[15px] font-mono font-medium text-white truncate">.config</span>
+              </div>
+              <div class="flex items-center space-x-2 text-neutral-400 shrink-0">
+                <span class="text-[12px] font-mono">5 items</span>
+                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+
+            <!-- 3. Middle Folder: .git -->
+            <div class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-[4px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <span class="text-[15px] font-mono font-medium text-white truncate">.git</span>
+              </div>
+              <div class="flex items-center space-x-2 text-neutral-400 shrink-0">
+                <span class="text-[12px] font-mono">v2.42</span>
+                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+
+            <!-- 4. Middle Folder: packages -->
+            <div class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-[4px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <span class="text-[15px] font-mono font-medium text-white truncate">packages</span>
+              </div>
+              <div class="flex items-center space-x-2 text-neutral-400 shrink-0">
+                <span class="text-[12px] font-mono">90 files</span>
+                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+
+            <!-- 5. Middle Folder: database (Interactive - Tapping navigates to its own dedicated page) -->
+            <div onclick="navigateToFolder('database')" class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] hover:bg-[#24262c] rounded-[4px] flex items-center justify-between transition-colors cursor-pointer border border-transparent hover:border-neutral-700/60" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[15px] font-mono font-medium text-white truncate">database</span>
+                  <span class="text-[11px] font-mono text-neutral-400 truncate">Tap to open folder page</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 text-neutral-400 shrink-0">
+                <span class="text-[12px] font-mono">14 files</span>
+                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+
+            <!-- 6. Bottom File: .gitignore -->
+            <div onclick="openPreview('.gitignore', 'plaintext')" class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-t-[4px] rounded-b-[26px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <span class="text-[15px] font-mono font-medium text-white truncate">.gitignore</span>
+              </div>
+              <div class="flex items-center space-x-2 shrink-0">
+                <span class="text-[12px] font-mono text-neutral-400">712 B</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- VIEW 2: DEDICATED FOLDER PAGE (database) -->
+      <div id="folder-view" class="w-full hidden flex-col space-y-6">
+
+        <!-- Subdirectories inside database -->
+        <section class="w-full flex flex-col" data-section="subdirectories">
+          <h2 class="text-[13px] font-medium text-[#5c7394] px-3 mb-[8px] tracking-wide">Subdirectories</h2>
+          <div class="w-full flex flex-col space-y-[3px]">
+            <!-- Top Folder: migrations -->
+            <div class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-t-[26px] rounded-b-[4px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <span class="text-[15px] font-mono font-medium text-white truncate">migrations</span>
+              </div>
+              <div class="flex items-center space-x-2 text-neutral-400 shrink-0">
+                <span class="text-[12px] font-mono">12 SQL files</span>
+                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+
+            <!-- Bottom Folder: seeds -->
+            <div class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-t-[4px] rounded-b-[26px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <span class="text-[15px] font-mono font-medium text-white truncate">seeds</span>
+              </div>
+              <div class="flex items-center space-x-2 text-neutral-400 shrink-0">
+                <span class="text-[12px] font-mono">2 files</span>
+                <svg class="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Files inside database -->
+        <section class="w-full flex flex-col" data-section="folder-files">
+          <h2 class="text-[13px] font-medium text-[#5c7394] px-3 mb-[8px] tracking-wide">Files</h2>
+          <div class="w-full flex flex-col space-y-[3px]">
+            <!-- Top Item: schema.sql (Modified) -->
+            <div onclick="openPreview('schema.sql', 'sql')" class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-t-[26px] rounded-b-[4px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[15px] font-mono font-medium text-white truncate">schema.sql</span>
+                  <span class="text-[11px] font-mono text-neutral-400 truncate">SQL table definitions &amp; indexes</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2.5 shrink-0">
+                <span class="w-5 h-5 rounded bg-neutral-800 text-neutral-300 text-[10px] font-mono font-bold flex items-center justify-center border border-neutral-700">M</span>
+                <span class="text-[12px] font-mono text-neutral-400">8.4 KB</span>
+              </div>
+            </div>
+
+            <!-- Middle Item: client.ts -->
+            <div onclick="openPreview('client.ts', 'typescript')" class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-[4px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[15px] font-mono font-medium text-white truncate">client.ts</span>
+                  <span class="text-[11px] font-mono text-neutral-400 truncate">Connection pool &amp; ORM config</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 shrink-0">
+                <span class="text-[12px] font-mono text-neutral-400">1.8 KB</span>
+              </div>
+            </div>
+
+            <!-- Middle Item: types.ts -->
+            <div onclick="openPreview('types.ts', 'typescript')" class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-[4px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[15px] font-mono font-medium text-white truncate">types.ts</span>
+                  <span class="text-[11px] font-mono text-neutral-400 truncate">Generated database typings</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 shrink-0">
+                <span class="text-[12px] font-mono text-neutral-400">12.1 KB</span>
+              </div>
+            </div>
+
+            <!-- Bottom Item: db.config.json -->
+            <div onclick="openPreview('db.config.json', 'json')" class="file-item w-full h-[64px] px-4 bg-[#1d1e22] active:bg-[#282a30] rounded-t-[4px] rounded-b-[26px] flex items-center justify-between transition-colors cursor-pointer" role="button" tabindex="0">
+              <div class="flex items-center space-x-3.5 min-w-0 flex-1 mr-2">
+                <div class="w-5 h-5 flex items-center justify-center text-neutral-300 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[15px] font-mono font-medium text-white truncate">db.config.json</span>
+                  <span class="text-[11px] font-mono text-neutral-400 truncate">Database dialect settings</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 shrink-0">
+                <span class="text-[12px] font-mono text-neutral-400">540 B</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <!-- Bottom Gesture Home Bar Indicator -->
+    <footer class="w-full flex justify-center items-center pt-3 pb-3 shrink-0" data-purpose="home-bar">
+      <div class="w-36 h-1 bg-neutral-600 rounded-full"></div>
+    </footer>
+
+  </div>
+
+  <!-- MODAL: File Preview Sheet (Fits within screen, overflow-y-auto) -->
+  <div id="preview-modal" class="modal-backdrop fixed inset-0 z-50 flex items-end justify-center hidden" onclick="handleBackdropClick(event, 'preview-modal')">
+    <div class="w-full max-w-md bg-[#1d1e22] rounded-t-[32px] p-5 shadow-2xl flex flex-col max-h-[82vh] overflow-hidden border-t border-neutral-800" onclick="event.stopPropagation()">
+      <div class="flex justify-between items-center pb-3 border-b border-neutral-800 shrink-0">
+        <div class="flex items-center space-x-2 truncate">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+          <h3 id="preview-filename" class="text-sm font-mono font-semibold text-white truncate">index.ts</h3>
+        </div>
+        <button onclick="closePreview()" class="p-1 text-neutral-400 hover:text-white" type="button">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <!-- Scrollable Code Content -->
+      <div class="flex-1 overflow-y-auto mt-3 py-2 pr-1 font-mono text-xs text-neutral-300 leading-relaxed min-h-0 bg-[#141518] p-3 rounded-2xl border border-neutral-800/80">
+        <pre id="preview-content" class="overflow-x-auto whitespace-pre">Loading preview...</pre>
+      </div>
+      <div class="mt-4 flex justify-end shrink-0">
+        <button onclick="closePreview()" class="px-5 py-2 bg-neutral-800 active:bg-neutral-700 text-xs font-mono font-medium rounded-xl text-neutral-200">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Quick Add Modal (Controlled height, never overflowing) -->
+  <div id="create-modal" class="modal-backdrop fixed inset-0 z-50 flex items-end justify-center hidden" onclick="handleBackdropClick(event, 'create-modal')">
+    <div class="w-full max-w-md bg-[#1d1e22] rounded-t-[32px] p-6 shadow-2xl flex flex-col max-h-[82vh] border-t border-neutral-800" onclick="event.stopPropagation()">
+      <div class="flex justify-between items-center pb-3 border-b border-neutral-800 shrink-0">
+        <h3 class="text-sm font-mono font-semibold text-white">Create New Item</h3>
+        <button onclick="closeCreateModal()" class="p-1 text-neutral-400 hover:text-white" type="button">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <div class="py-4 space-y-2.5 font-mono text-xs">
+        <button onclick="alert('New file prompt simulated'); closeCreateModal();" class="w-full py-3 px-4 rounded-xl bg-[#25272e] hover:bg-[#2d3038] text-left text-neutral-200 flex items-center justify-between">
+          <span>+ New File</span>
+          <span class="text-neutral-500 text-[10px]">file.ts</span>
+        </button>
+        <button onclick="alert('New folder prompt simulated'); closeCreateModal();" class="w-full py-3 px-4 rounded-xl bg-[#25272e] hover:bg-[#2d3038] text-left text-neutral-200 flex items-center justify-between">
+          <span>+ New Folder</span>
+          <span class="text-neutral-500 text-[10px]">directory/</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE SCRIPTS -->
+  <script data-purpose="mock-router-and-interactions">
+    let currentView = 'root'; // 'root' or 'database'
+
+    function navigateToFolder(folderName) {
+      if (folderName === 'database') {
+        currentView = 'database';
+        document.getElementById('root-view').classList.add('hidden');
+        document.getElementById('folder-view').classList.remove('hidden');
+        document.getElementById('folder-view').classList.add('flex');
+        
+        document.getElementById('page-title').innerText = 'database';
+        document.getElementById('breadcrumb-bar').classList.remove('hidden');
+        document.getElementById('breadcrumb-bar').classList.add('flex');
+        document.getElementById('breadcrumb-current').innerText = folderName;
+        document.getElementById('search-input').placeholder = `Search in ${folderName}/`;
+        document.getElementById('files-scroll-container').scrollTop = 0;
+      }
+    }
+
+    function navigateToRoot() {
+      currentView = 'root';
+      document.getElementById('folder-view').classList.add('hidden');
+      document.getElementById('folder-view').classList.remove('flex');
+      document.getElementById('root-view').classList.remove('hidden');
+      document.getElementById('root-view').classList.add('flex');
+
+      document.getElementById('page-title').innerText = 'Files';
+      document.getElementById('breadcrumb-bar').classList.add('hidden');
+      document.getElementById('breadcrumb-bar').classList.remove('flex');
+      document.getElementById('search-input').placeholder = 'Search files and code';
+      document.getElementById('files-scroll-container').scrollTop = 0;
+    }
+
+    function navigateBack() {
+      if (currentView === 'database') {
+        navigateToRoot();
+      } else {
+        // At root: Simulated back action
+        console.log('Navigated back from Files root');
+      }
+    }
+
+    // Search Filtering
+    function handleSearch(query) {
+      const q = query.toLowerCase().trim();
+      const items = document.querySelectorAll('.file-item');
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (!q || text.includes(q)) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // Modal Previews
+    const sampleFiles = {
+      'index.ts': `import { createServer } from "http";\nimport { app } from "./src/server";\n\nconst PORT = process.env.PORT || 3000;\n\ncreateServer(app).listen(PORT, () => {\n  console.log(\`Server listening on http://localhost:\${PORT}\`);\n});`,
+      'README.md': `# Cat-Bot Workspace\n\nProduction AI Agent execution runtime with multi-file workspace tools.\n\n## Getting Started\n\`\`\`bash\npnpm install\npnpm dev\n\`\`\`\n\n## Modules\n- Database layer with migrations & schema definitions.\n- Pinned agent configs and git workspace hooks.`,
+      'schema.sql': `CREATE TABLE IF NOT EXISTS users (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  email VARCHAR(255) UNIQUE NOT NULL,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n);\n\nCREATE TABLE IF NOT EXISTS agent_runs (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  user_id UUID REFERENCES users(id),\n  status VARCHAR(50) NOT NULL,\n  started_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n);`,
+      'client.ts': `import { Pool } from "pg";\n\nexport const dbPool = new Pool({\n  connectionString: process.env.DATABASE_URL,\n  max: 20,\n  idleTimeoutMillis: 30000,\n});`,
+      'types.ts': `export interface User {\n  id: string;\n  email: string;\n  created_at: string;\n}\n\nexport interface AgentRun {\n  id: string;\n  userId: string;\n  status: "idle" | "running" | "completed" | "failed";\n  startedAt: string;\n}`,
+      'db.config.json': `{\n  "dialect": "postgres",\n  "ssl": true,\n  "migrationDir": "./migrations",\n  "seedDir": "./seeds"\n}`,
+      '.gitignore': `node_modules/\n.env\n.env.local\ndist/\n*.log\n.DS_Store`
+    };
+
+    function openPreview(filename, type) {
+      document.getElementById('preview-filename').innerText = filename;
+      document.getElementById('preview-content').innerText = sampleFiles[filename] || `// Content of ${filename}\n// Size: 1.2 KB`;
+      document.getElementById('preview-modal').classList.remove('hidden');
+    }
+
+    function closePreview() {
+      document.getElementById('preview-modal').classList.add('hidden');
+    }
+
+    function openCreateModal() {
+      document.getElementById('create-modal').classList.remove('hidden');
+    }
+
+    function closeCreateModal() {
+      document.getElementById('create-modal').classList.add('hidden');
+    }
+
+    function handleBackdropClick(e, modalId) {
+      if (e.target.id === modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
