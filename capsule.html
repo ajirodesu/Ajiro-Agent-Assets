@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-visual">
   <meta name="theme-color" content="#212121">
   <meta name="color-scheme" content="dark">
   <title>Ajiro Agent – Message Capsule</title>
@@ -61,7 +61,9 @@
       padding: 8px 0 calc(12px + env(safe-area-inset-bottom, 0px));
       pointer-events: none;
       background: linear-gradient(to top, var(--page-bg) 70%, transparent);
-      transform: translate3d(0, calc(-1 * var(--keyboard-offset)), 0);
+      /* env() is driven by the browser every frame of the keyboard animation (VirtualKeyboard API);
+         --keyboard-offset is the visualViewport fallback (iOS Safari, older Android). */
+      transform: translate3d(0, calc(-1 * max(var(--keyboard-offset), env(keyboard-inset-height, 0px))), 0);
     }
     #footerContainer.kb-open { padding-bottom: 8px; }
 
@@ -359,6 +361,7 @@
   const STREAM_GAP     = 12;   // breathing room between last message and composer
   const KB_OPEN_MIN_PX = 50;   // ignore tiny viewport deltas (URL bars, etc.)
   const COARSE = window.matchMedia('(pointer: coarse)');
+  const VK = navigator.virtualKeyboard || null;   // Chromium VirtualKeyboard API
 
   /* ═════════════════════════ State ═════════════════════════ */
   let focused   = false;
@@ -370,7 +373,7 @@
   let fitKey    = '';               // memo for fitsOnOneLine
   let fitVal    = true;
   let rafSync   = 0;
-  let rafView   = 0;
+  let stick     = true;             // is the stream pinned to the bottom?
 
   /* ═════════════════════════ Measurement ═════════════════════════ */
   // Mirror the textarea's typography onto the off-screen clone (re-run when fonts load).
@@ -454,14 +457,17 @@
   const queueSync = () => { if (!rafSync) rafSync = requestAnimationFrame(sync); };
 
   /* ═════════════════════════ Keep messages clear of the composer ═════════════════════════ */
+  chatStream.addEventListener('scroll', () => {
+    stick = chatStream.scrollHeight - chatStream.scrollTop - chatStream.clientHeight < 80;
+  }, { passive: true });
+
   function updateStreamPadding() {
-    const nearBottom = chatStream.scrollHeight - chatStream.scrollTop - chatStream.clientHeight < 80;
-    const pad = footer.offsetHeight + STREAM_GAP;
+    const pad = footer.offsetHeight + kbOffset + STREAM_GAP;
     if (pad !== streamPad) {
       streamPad = pad;
       chatStream.style.paddingBottom = pad + 'px';
     }
-    if (nearBottom) chatStream.scrollTop = chatStream.scrollHeight;
+    if (stick) chatStream.scrollTop = chatStream.scrollHeight;
   }
 
   /* ═════════════════════════ Keyboard ═════════════════════════ */
@@ -475,22 +481,29 @@
     document.documentElement.style.setProperty('--keyboard-offset', next + 'px');
     footer.classList.toggle('kb-open', open);
     updateKeyboardDiagnostics(open, simulated);
+    updateStreamPadding();                // keep the latest message above composer + keyboard
   }
 
+  // Fallback path (iOS Safari, older Android): derive the keyboard height from visualViewport.
+  // These events already fire once per frame, so they are applied immediately (no extra delay).
   function handleViewportChange() {
-    rafView = 0;
-    if (kbSimulated) return;
+    if (kbSimulated || VK) return;
     const vv = window.visualViewport;
     if (!vv) return;
     const layoutH = document.documentElement.clientHeight;
     setKeyboardOffset(layoutH - (vv.offsetTop + vv.height), false);
     if (window.scrollY !== 0) window.scrollTo(0, 0);   // stop iOS from panning the page
   }
-  const queueViewport = () => { if (!rafView) rafView = requestAnimationFrame(handleViewportChange); };
 
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', queueViewport, { passive: true });
-    window.visualViewport.addEventListener('scroll', queueViewport, { passive: true });
+  if (VK) {
+    // Preferred path: the keyboard overlays the page and the browser reports its exact geometry.
+    try { VK.overlaysContent = true; } catch (_) {}
+    VK.addEventListener('geometrychange', () => {
+      if (!kbSimulated) setKeyboardOffset(VK.boundingRect.height, false);
+    });
+  } else if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleViewportChange, { passive: true });
+    window.visualViewport.addEventListener('scroll', handleViewportChange, { passive: true });
   }
 
   /* ═════════════════════════ Focus & input handling ═════════════════════════ */
@@ -560,9 +573,10 @@
   }
 
   /* ═════════════════════════ Layout observers ═════════════════════════ */
-  window.addEventListener('resize', () => { queueViewport(); queueSync(); }, { passive: true });
-  window.addEventListener('orientationchange', () => { queueViewport(); queueSync(); }, { passive: true });
-  window.addEventListener('pageshow', (e) => { if (e.persisted) { queueViewport(); queueSync(); } });
+  const onViewportEvent = () => { handleViewportChange(); updateStreamPadding(); queueSync(); };
+  window.addEventListener('resize', onViewportEvent, { passive: true });
+  window.addEventListener('orientationchange', onViewportEvent, { passive: true });
+  window.addEventListener('pageshow', (e) => { if (e.persisted) onViewportEvent(); });
 
   if ('ResizeObserver' in window) new ResizeObserver(updateStreamPadding).observe(footer);
   if (document.fonts && document.fonts.ready) {
@@ -621,7 +635,7 @@
       kbBtn.textContent = 'Close keyboard (290px)';
       kbBtn.className = 'tbtn amber';
     } else {
-      setKeyboardOffset(0, false);
+      setKeyboardOffset(VK ? VK.boundingRect.height : 0, false);
       kbBtn.textContent = 'Simulate keyboard';
       kbBtn.className = 'tbtn sky';
       handleViewportChange();
